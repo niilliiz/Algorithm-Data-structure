@@ -1,6 +1,6 @@
 import { getSortedRandomArray } from "../../../utils/array-random";
 
-function BinarySearch(arr: number[], value: number): number {
+export function BinarySearch(arr: number[], value: number): number {
   let low = 0;
   let high = arr.length - 1;
 
