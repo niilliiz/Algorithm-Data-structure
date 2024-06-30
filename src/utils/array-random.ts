@@ -21,3 +21,9 @@ function getSortedRandomArray(
 }
 
 export { getRandomArray,getSortedRandomArray };
+
+
+interface User{
+  name:string;
+  id:number
+}
