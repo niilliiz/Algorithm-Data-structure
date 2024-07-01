@@ -17,13 +17,7 @@ function getSortedRandomArray(
   return Array.from(
     Array(length),
     () => Math.floor(Math.random() * (max - min + 1)) + min,
-  ).sort((a,b)=>a-b);
+  ).sort((a, b) => a - b);
 }
 
-export { getRandomArray,getSortedRandomArray };
-
-
-interface User{
-  name:string;
-  id:number
-}
+export { getRandomArray, getSortedRandomArray };
