@@ -6,21 +6,37 @@ import {
 } from "../../interfaces/interface-linked-list";
 
 class LinkedList<T> implements ILinkedList<T> {
-  x: number = 5;
-  y: number = 44;
+  head: ILinkedListNode<T> = null;
+
+  get(index: number): T {}
+
+  get length(): number {}
+
+  traverse(): string {
+    let temp = this.head;
+    let traverse = "";
+
+    while (temp.next !== null) {
+      traverse = traverse + `->${temp.data}`;
+      temp = temp.next;
+    }
+
+    return traverse;
+  }
+
+  search(data: T): number | -1 {}
+  sort(): void {}
+
+  insertAtBeginning(data: T): void {}
+  insertAt(data: T, index: number): void {}
+  insertAtEnd(data: T): void {}
+
+  deleteFromBeginning(data: T): void {}
+  deleteFrom(data: T, index: number): void {}
+  deleteFromEnd(data: T): void {}
 }
 
 const ll = new LinkedList();
 
-interface Person1 {
-  readonly name?: string;
-}
-
-function greet(person: Person) {
-  console.log(person.age);
-  person.age = "55";
-}
-
-type Person = {
-  age?: string;
-};
+// todo:
+//
