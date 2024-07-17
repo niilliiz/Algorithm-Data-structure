@@ -11,9 +11,9 @@ export interface ILinkedList<T> {
   insertAtEnd(data: T): void;
   insertAt(data: T, index: number): void;
 
-  deleteFromBeginning(data: T): void;
-  deleteFromEnd(data: T): void;
-  deleteFrom(data: T, index: number): void;
+  deleteFromBeginning(): void;
+  deleteFromEnd(): void;
+  deleteFrom(index: number): void;
 }
 
 export interface ILinkedListNode<T> {
