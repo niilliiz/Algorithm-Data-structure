@@ -1,9 +1,6 @@
 // tsx src/DS/linked-list/linked-list.ts command
 
-import {
-  ILinkedList,
-  ILinkedListNode,
-} from "../../interfaces/interface-linked-list";
+import { ILinkedList, ILinkedListNode } from "../../interfaces/interface-linked-list";
 
 class LinkedList<T> implements ILinkedList<T> {
   head: ILinkedListNode<T> = null;
@@ -27,7 +24,12 @@ class LinkedList<T> implements ILinkedList<T> {
   search(data: T): number | -1 {}
   sort(): void {}
 
-  insertAtBeginning(data: T): void {}
+  insertAtBeginning(data: T): void {
+    this.head = {
+      data,
+      next: this.head,
+    };
+  }
   insertAt(data: T, index: number): void {}
   insertAtEnd(data: T): void {}
 
@@ -38,5 +40,6 @@ class LinkedList<T> implements ILinkedList<T> {
 
 const ll = new LinkedList();
 
-// todo:
-//
+ll.traverse()
+ll.insertAtBeginning("1")
+
