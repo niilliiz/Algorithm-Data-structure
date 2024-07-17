@@ -8,7 +8,17 @@ import {
 class LinkedList<T> implements ILinkedList<T> {
   head: ILinkedListNode<T> = null;
 
-  get(index: number): T {}
+  getNode(index: number): ILinkedListNode<T> | undefined {
+    let pointer = this.head;
+    let i = 0;
+    while (pointer.next !== null) {
+      if (i === index) {
+        return pointer;
+      }
+      pointer = pointer.next;
+      i++;
+    }
+  }
 
   get length(): number {}
 
@@ -33,13 +43,26 @@ class LinkedList<T> implements ILinkedList<T> {
       next: this.head,
     };
   }
-  insertAt(data: T, index: number): void {}
+
+  insertAt(data: T, index: number): void {
+    if (index === 0) {
+      this.insertAtBeginning(data);
+    } else {
+      const prevNode = this.getNode(index - 1);
+
+      if (prevNode) {
+        prevNode.next = { data, next: prevNode.next };
+      }
+    }
+  }
+
   insertAtEnd(data: T): void {
     const newNode: ILinkedListNode<T> = {
       data,
 
       next: null,
     };
+
     if (this.head === null) {
       this.head = newNode;
     } else {

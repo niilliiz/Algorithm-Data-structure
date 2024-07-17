@@ -1,5 +1,5 @@
 export interface ILinkedList<T> {
-  get(index: number): T | undefined;
+  getNode(index: number): ILinkedListNode<T> | undefined;
 
   get length(): number;
 
