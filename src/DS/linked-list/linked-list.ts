@@ -1,6 +1,9 @@
 // tsx src/DS/linked-list/linked-list.ts command
 
-import { ILinkedList, ILinkedListNode } from "../../interfaces/interface-linked-list";
+import {
+  ILinkedList,
+  ILinkedListNode,
+} from "../../interfaces/interface-linked-list";
 
 class LinkedList<T> implements ILinkedList<T> {
   head: ILinkedListNode<T> = null;
@@ -31,7 +34,24 @@ class LinkedList<T> implements ILinkedList<T> {
     };
   }
   insertAt(data: T, index: number): void {}
-  insertAtEnd(data: T): void {}
+  insertAtEnd(data: T): void {
+    const newNode: ILinkedListNode<T> = {
+      data,
+
+      next: null,
+    };
+    if (this.head === null) {
+      this.head = newNode;
+    } else {
+      let temp = this.head;
+
+      while (temp.next !== null) {
+        temp = temp.next;
+      }
+
+      temp.next = newNode;
+    }
+  }
 
   deleteFromBeginning(data: T): void {}
   deleteFrom(data: T, index: number): void {}
@@ -40,6 +60,5 @@ class LinkedList<T> implements ILinkedList<T> {
 
 const ll = new LinkedList();
 
-ll.traverse()
-ll.insertAtBeginning("1")
-
+ll.traverse();
+ll.insertAtBeginning("1");
