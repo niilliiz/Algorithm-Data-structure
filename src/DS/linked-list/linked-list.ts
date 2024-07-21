@@ -81,9 +81,39 @@ class LinkedList<T> implements ILinkedList<T> {
       this.head = this.head.next;
     }
   }
-  deleteFrom(index: number): void {}
+
+  deleteFrom(index: number): void {
+    if (index === 0) {
+      this.deleteFromBeginning();
+      return;
+    }
+
+    const prevNode = this.getNode(index - 1);
+
+    if (prevNode) {
+      const currentNode = prevNode.next;
+
+      if (currentNode) {
+        const nextNode = currentNode.next;
+
+        if (nextNode) {
+          prevNode.next = nextNode;
+
+          currentNode.next = null;
+        } else {
+          prevNode.next = null;
+        }
+      }
+    }
+  }
+
   deleteFromEnd(): void {
-    const pointer = this.head;
+    let pointer = this.head;
+    while (pointer.next.next !== null) {
+      pointer = pointer.next;
+    }
+
+    pointer.next = null;
   }
 }
 
