@@ -6,9 +6,9 @@ import {
 } from "../../interfaces/interface-linked-list";
 
 class LinkedList<T> implements ILinkedList<T> {
-  head: ILinkedListNode<T> = null;
+  private head: ILinkedListNode<T> = null;
 
-  getNode(index: number): ILinkedListNode<T> | undefined {
+  private getNode(index: number): ILinkedListNode<T> | undefined {
     let pointer = this.head;
     let i = 0;
     while (pointer.next !== null) {

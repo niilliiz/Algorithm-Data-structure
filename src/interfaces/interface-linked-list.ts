@@ -1,6 +1,4 @@
 export interface ILinkedList<T> {
-  getNode(index: number): ILinkedListNode<T> | undefined;
-
   get length(): number;
 
   traverse(): string;
