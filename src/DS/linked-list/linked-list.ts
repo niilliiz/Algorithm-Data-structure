@@ -20,7 +20,17 @@ class LinkedList<T> implements ILinkedList<T> {
     }
   }
 
-  get length(): number {}
+  get length(): number {
+    let temp = this.head;
+    let length = 0;
+
+    while (temp.next !== null) {
+      length++;
+      temp = temp.next;
+    }
+
+    return length;
+  }
 
   traverse(): string {
     let temp = this.head;
@@ -34,7 +44,18 @@ class LinkedList<T> implements ILinkedList<T> {
     return traverse;
   }
 
-  search(data: T): number | -1 {}
+  search(data: T): true | false {
+    let temp = this.head;
+    while (temp.next !== null) {
+      if (temp.data === data) {
+        return true;
+      }
+
+      temp = temp.next;
+    }
+
+    return false;
+  }
   sort(): void {}
 
   insertAtBeginning(data: T): void {

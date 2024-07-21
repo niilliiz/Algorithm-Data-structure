@@ -2,7 +2,7 @@ export interface ILinkedList<T> {
   get length(): number;
 
   traverse(): string;
-  search(data: T): number | -1;
+  search(data: T): boolean;
   sort(): void;
 
   insertAtBeginning(data: T): void;
