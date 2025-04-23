@@ -11,3 +11,17 @@ export interface IStack<T> {
   isEmpty(): boolean;
   size(): number;
 }
+
+// QUEUE
+export interface IQueueNode<T> {
+  value: T;
+  prev?: IQueueNode<T>;
+}
+
+export interface IQueue<T> {
+  enqueue(value: T): void;
+  dequeue(): T | undefined;
+  peek(): T | undefined;
+  isEmpty(): boolean;
+  isFull(): boolean;
+}
