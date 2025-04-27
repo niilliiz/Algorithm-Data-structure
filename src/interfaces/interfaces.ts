@@ -24,4 +24,5 @@ export interface IQueue<T> {
   peek(): T | undefined;
   isEmpty(): boolean;
   isFull(): boolean;
+  getSize(): number;
 }
