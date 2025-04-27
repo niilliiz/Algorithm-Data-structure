@@ -1,8 +1,8 @@
-import { IStackNode } from "../../interfaces/interfaces";
+import { IStack, IStackNode } from "../../interfaces/interfaces";
 
-export default class Stack<T> {
+export default class Stack<T> implements IStack<T> {
   private length: number;
-  private head: IStackNode<T>;
+  private head: IStackNode<T> | undefined;
 
   constructor() {
     this.length = 0;

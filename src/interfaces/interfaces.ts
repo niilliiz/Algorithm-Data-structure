@@ -1,7 +1,7 @@
 // STACK
 export interface IStackNode<T> {
   value: T;
-  prev?: IStackNode<T>;
+  prev?: IStackNode<T> | undefined;
 }
 
 export interface IStack<T> {
@@ -15,7 +15,7 @@ export interface IStack<T> {
 // QUEUE
 export interface IQueueNode<T> {
   value: T;
-  prev?: IQueueNode<T>;
+  next?: IQueueNode<T> | undefined;
 }
 
 export interface IQueue<T> {
