@@ -26,3 +26,22 @@ export interface IQueue<T> {
   isFull(): boolean;
   getSize(): number;
 }
+
+// DEQUEUE
+export interface IDeQueueNode<T> {
+  value: T;
+  next?: IDeQueueNode<T> | undefined;
+  prev?: IDeQueueNode<T> | undefined;
+}
+
+export interface IDeQueue<T> {
+  addHead(value: T): void;
+  addTail(value: T): void;
+  removeHead(): T | undefined;
+  removeTail(): T | undefined;
+  peekHead(): T | undefined;
+  peekTail(): T | undefined;
+  isEmpty(): boolean;
+  isFull(): boolean;
+  getSize(): number;
+}
