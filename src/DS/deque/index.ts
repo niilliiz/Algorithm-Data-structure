@@ -17,22 +17,77 @@ export class DeQueue<T> implements IDeQueue<T> {
     if (this.isFull()) {
       return;
     }
+
+    const node = { value } as IDeQueueNode<T>;
+
+    if (this.isEmpty()) {
+      this.length++;
+      this.head = this.tail = node;
+      return;
+    }
+
+    this.length++;
+
+    node.next = this.head;
+    this.head!.prev = node;
+    this.head = node;
   }
   addTail(value: T) {
     if (this.isFull()) {
       return;
     }
+
+    if (this.isEmpty()) {
+      this.addHead(value);
+      return;
+    }
+
+    const node = { value } as IDeQueueNode<T>;
+    this.length++;
+
+    node.prev = this.tail;
+    this.tail!.next = node;
+    this.tail = node;
   }
 
   removeHead(): T | undefined {
     if (this.isEmpty()) {
       return;
     }
+
+    const outNode = this.head;
+    this.length--;
+
+    if (this.head === this.tail) {
+      this.tail = this.head = undefined;
+
+      outNode.next = outNode.prev = undefined;
+      return outNode.value;
+    }
+
+    this.head = outNode.next;
+    this.head.prev = undefined;
+    outNode.next = outNode.prev = undefined;
+
+    return outNode.value;
   }
   removeTail(): T | undefined {
     if (this.isEmpty()) {
       return;
     }
+
+    if (this.head === this.tail) {
+      return this.removeHead();
+    }
+
+    const outNode = this.tail;
+    this.length--;
+
+    this.tail = outNode.prev;
+    this.tail.next = undefined;
+    outNode.prev = undefined;
+
+    return outNode.value;
   }
 
   peekHead(): T | undefined {
