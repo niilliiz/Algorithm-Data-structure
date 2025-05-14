@@ -1,4 +1,4 @@
-import { IQueue, IQueueNode } from "../../interfaces/interfaces";
+import { IQueue, IQueueNode } from "../../interfaces/IQueue";
 
 export class QueueCircular<T> implements IQueue<T> {
   private length: number;

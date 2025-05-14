@@ -1,4 +1,4 @@
-import { IDeQueue, IDeQueueNode } from "../../interfaces/interfaces";
+import { IDeQueue, IDeQueueNode } from "../../interfaces/IQueue";
 
 export class DeQueue<T> implements IDeQueue<T> {
   private length: number;

@@ -1,4 +1,4 @@
-import { IStack, IStackNode } from "../../interfaces/interfaces";
+import { IStack, IStackNode } from "../../interfaces/IStack";
 
 export default class Stack<T> implements IStack<T> {
   private length: number;
