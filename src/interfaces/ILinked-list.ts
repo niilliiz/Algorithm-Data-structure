@@ -1,13 +1,19 @@
-// STACK
+// Singly Linked list
 export interface ISinglyLinkedList<T> {
   value: T;
-  next?: ISinglyLinkedList<T> | undefined;
+  next?: ISinglyLinkedList<T> | null;
 }
 
 export interface ISinglyLinkedList<T> {
-  push(value: T): void;
-  pop(): T | undefined;
-  peek(): T | undefined;
+  traverse(position: number): string;
+  insertAtBeginning(value: T): void;
+  insertAtMiddle(value: T): void;
+  insertAtEnd(value: T): void;
+  deleteAtBeginning(position: number): void;
+  deleteAtMiddle(position: number): void;
+  deleteAtEnd(position: number): void;
+  search(value: T): boolean;
+  sort(): string;
   isEmpty(): boolean;
-  size(): number;
+  isFull(): boolean;
 }
