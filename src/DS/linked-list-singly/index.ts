@@ -1,8 +1,11 @@
-import { ISinglyLinkedList } from "../../interfaces/ILinked-list";
+import {
+  ISinglyLinkedList,
+  ISinglyLinkedListNode,
+} from "../../interfaces/ILinked-list";
 
 export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
   private length: number;
-  private head: ISinglyLinkedList<T> | undefined;
+  private head: ISinglyLinkedListNode<T> | undefined;
   private readonly size: number;
 
   constructor(size: number) {
@@ -11,11 +14,27 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
     this.size = size;
   }
 
-  traverse(position?: number): string {
-    if (this.isEmpty()) return "";
+  print(): string {}
 
-    // if position is given, means we want to traverse to the position
-    // if position is not given, means we want to traverse to the end of lined-list(next is null)
+  traverse(position?: number | undefined): ISinglyLinkedListNode<T> {
+    if (this.isEmpty()) return null;
+
+    let count = 0;
+    let currentNode = this.head;
+
+    if (position === undefined) {
+      while (currentNode?.next) {
+        currentNode = currentNode.next;
+      }
+      return currentNode;
+    }
+
+    while (count < position - 1 && currentNode?.next) {
+      currentNode = currentNode.next;
+      count++;
+    }
+
+    return currentNode;
   }
 
   insertAtBeginning(value: T) {
@@ -28,13 +47,16 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return;
     }
   }
-  insertAtMiddle(value: T) {
+  insertAtMiddle(value: T, position: number) {
+    // at pos-1 -> this.traverse(position-1)
+
     if (this.isFull()) {
       return;
     }
   }
 
   deleteAtBeginning(position: number) {
+    // at pos-1 -> this.traverse(position-1)
     if (this.isEmpty()) {
       return;
     }
