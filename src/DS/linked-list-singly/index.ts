@@ -64,6 +64,11 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return;
     }
 
+    if (position === 0) {
+      this.insertAtBeginning(value);
+      return;
+    }
+
     this.length++;
     const node = { value } as ISinglyLinkedListNode<T>;
     const prevNode = this.traverse(position - 1);
@@ -112,6 +117,11 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
   }
   deleteAtMiddle(position: number): T | undefined {
     if (this.isEmpty()) {
+      return;
+    }
+
+    if (position === this.length) {
+      this.deleteAtEnd();
       return;
     }
 
