@@ -14,12 +14,9 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
     this.size = size;
   }
 
-  print(): string {}
-
-  traverse(position?: number | undefined): ISinglyLinkedListNode<T> {
+  traverse(position?: number): ISinglyLinkedListNode<T> | null {
     if (this.isEmpty()) return null;
 
-    let count = 0;
     let currentNode = this.head;
 
     if (position === undefined) {
@@ -29,7 +26,12 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return currentNode;
     }
 
-    while (count < position - 1 && currentNode?.next) {
+    if (position < 0 || position >= this.length) {
+      return null;
+    }
+
+    let count = 0;
+    while (count < position && currentNode?.next) {
       currentNode = currentNode.next;
       count++;
     }
@@ -41,39 +43,84 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
     if (this.isFull()) {
       return;
     }
+
+    const node = { value } as ISinglyLinkedListNode<T>;
+
+    if (this.isEmpty()) {
+      this.length++;
+      this.head = node;
+
+      return;
+    }
+
+    this.length++;
+    const currentNode = this.head;
+    this.head = node;
+    node.next = currentNode;
   }
+
+  insertAtMiddle(value: T, position: number) {
+    if (this.isFull()) {
+      return;
+    }
+
+    this.length++;
+    const node = { value } as ISinglyLinkedListNode<T>;
+    const prevNode = this.traverse(position - 1);
+
+    node.next = prevNode.next;
+    prevNode.next = node;
+  }
+
   insertAtEnd(value: T) {
     if (this.isFull()) {
       return;
     }
-  }
-  insertAtMiddle(value: T, position: number) {
-    // at pos-1 -> this.traverse(position-1)
 
-    if (this.isFull()) {
-      return;
-    }
+    this.length++;
+    const node = { value } as ISinglyLinkedListNode<T>;
+    const lastNode = this.traverse();
+    lastNode.next = node;
+    node.next = undefined;
   }
 
-  deleteAtBeginning(position: number) {
-    // at pos-1 -> this.traverse(position-1)
+  deleteAtBeginning(): T | undefined {
     if (this.isEmpty()) {
       return;
     }
-  }
-  deleteAtEnd(position: number) {
-    if (this.isEmpty()) {
-      return;
-    }
-  }
-  deleteAtMiddle(position: number) {
-    if (this.isEmpty()) {
-      return;
-    }
-  }
 
-  search(value: T): boolean {}
-  sort(): string {}
+    this.length--;
+    const outNode = this.head;
+    this.head = outNode.next;
+    outNode.next = undefined;
+
+    return outNode.value;
+  }
+  deleteAtEnd(): T | undefined {
+    if (this.isEmpty()) {
+      return;
+    }
+
+    const prevNode = this.traverse(this.length - 1);
+    const lastNode = prevNode.next;
+
+    prevNode.next = undefined;
+
+    this.length--;
+
+    return lastNode.value;
+  }
+  deleteAtMiddle(position: number): T | undefined {
+    if (this.isEmpty()) {
+      return;
+    }
+
+    const prevNode = this.traverse(position - 1);
+    const outNode = prevNode.next;
+    prevNode.next = outNode.next;
+    this.length--;
+    return outNode.value;
+  }
 
   isFull(): boolean {
     return this.size === this.length;
