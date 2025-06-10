@@ -141,9 +141,10 @@ describe("SinglyLinkedList", () => {
 
   describe("insertAtEnd()", () => {
     it("should handle insertion into empty list", () => {
-      // Note: This will likely fail due to bug in implementation
-      // insertAtEnd tries to call traverse() on empty list, which returns null
-      expect(() => list.insertAtEnd(5)).toThrow();
+      list.insertAtEnd(5);
+      expect(list.isEmpty()).toBe(false);
+      expect(list.traverse(0)?.value).toBe(5);
+      expect(list.traverse()?.value).toBe(5); // Should be the last (and only) element
     });
 
     it("should insert at end of non-empty list", () => {
@@ -185,9 +186,12 @@ describe("SinglyLinkedList", () => {
       expect(list.traverse(3)?.value).toBe(1);
     });
 
-    it("should handle insertion at position 0 (after head)", () => {
+    it("should handle insertion at position 0 (same as insertAtBeginning)", () => {
       list.insertAtMiddle(99, 0);
       expect(list.traverse(0)?.value).toBe(99);
+      expect(list.traverse(1)?.value).toBe(3);
+      expect(list.traverse(2)?.value).toBe(2);
+      expect(list.traverse(3)?.value).toBe(1);
     });
 
     it("should not insert when list is full", () => {
@@ -200,10 +204,22 @@ describe("SinglyLinkedList", () => {
       expect(list.isFull()).toBe(true);
     });
 
-    it("should handle edge cases with invalid positions", () => {
-      // This will likely cause errors due to traverse returning null
-      expect(() => list.insertAtMiddle(99, -1)).toThrow();
-      expect(() => list.insertAtMiddle(99, 10)).toThrow();
+    it("should handle edge cases with invalid positions gracefully", () => {
+      // Your implementation should handle these gracefully now
+      list.insertAtMiddle(99, -1); // Should not insert
+      list.insertAtMiddle(99, 10); // Should not insert
+
+      // List should remain unchanged
+      expect(list.traverse(0)?.value).toBe(3);
+      expect(list.traverse(1)?.value).toBe(2);
+      expect(list.traverse(2)?.value).toBe(1);
+      expect(list.traverse(3)).toBe(null);
+    });
+
+    it("should handle insertion into empty list at position 0", () => {
+      const emptyList = new SinglyLinkedList<number>(5);
+      emptyList.insertAtMiddle(42, 0);
+      expect(emptyList.traverse(0)?.value).toBe(42);
     });
   });
 
@@ -249,9 +265,10 @@ describe("SinglyLinkedList", () => {
     it("should handle single element list", () => {
       list.insertAtBeginning(42);
 
-      // This will likely fail due to bug: traverse(0) returns the only node,
-      // but code expects prevNode.next to exist
-      expect(() => list.deleteAtEnd()).toThrow();
+      // This should now work since you fixed the bug
+      const deleted = list.deleteAtEnd();
+      expect(deleted).toBe(42);
+      expect(list.isEmpty()).toBe(true);
     });
 
     it("should delete and return last element from multi-element list", () => {
@@ -273,6 +290,16 @@ describe("SinglyLinkedList", () => {
 
       list.deleteAtEnd();
       expect(list.isEmpty()).toBe(true);
+    });
+
+    it("should handle two element list correctly", () => {
+      list.insertAtBeginning(1);
+      list.insertAtBeginning(2);
+
+      const deleted = list.deleteAtEnd();
+      expect(deleted).toBe(1);
+      expect(list.traverse(0)?.value).toBe(2);
+      expect(list.traverse(1)).toBe(null);
     });
   });
 
@@ -297,16 +324,30 @@ describe("SinglyLinkedList", () => {
       expect(list.traverse(1)?.value).toBe(1);
     });
 
-    it("should handle deletion at position 0 (second element)", () => {
+    it("should handle deletion at position 0 (same as deleteAtBeginning)", () => {
       const deleted = list.deleteAtMiddle(0);
-      expect(deleted).toBe(2);
-      expect(list.traverse(0)?.value).toBe(3);
+      expect(deleted).toBe(3);
+      expect(list.traverse(0)?.value).toBe(2);
       expect(list.traverse(1)?.value).toBe(1);
     });
 
-    it("should handle edge cases with invalid positions", () => {
-      expect(() => list.deleteAtMiddle(-1)).toThrow();
-      expect(() => list.deleteAtMiddle(10)).toThrow();
+    it("should handle deletion at last position (same as deleteAtEnd)", () => {
+      const deleted = list.deleteAtMiddle(2); // Last element
+      expect(deleted).toBe(1);
+      expect(list.traverse(0)?.value).toBe(3);
+      expect(list.traverse(1)?.value).toBe(2);
+      expect(list.traverse(2)).toBe(null);
+    });
+
+    it("should handle edge cases with invalid positions gracefully", () => {
+      // These should return undefined and not throw
+      expect(list.deleteAtMiddle(-1)).toBeUndefined();
+      expect(list.deleteAtMiddle(10)).toBeUndefined();
+
+      // List should remain unchanged
+      expect(list.traverse(0)?.value).toBe(3);
+      expect(list.traverse(1)?.value).toBe(2);
+      expect(list.traverse(2)?.value).toBe(1);
     });
 
     it("should properly update length", () => {
@@ -321,17 +362,17 @@ describe("SinglyLinkedList", () => {
       list.insertAtBeginning(1);
       list.insertAtBeginning(2);
 
-      // Insert at end (if it works)
-      try {
-        list.insertAtEnd(3);
-        expect(list.traverse(2)?.value).toBe(3);
-      } catch (e) {
-        // Expected due to bug in insertAtEnd
-      }
+      // Insert at end (should work now)
+      list.insertAtEnd(3);
+      expect(list.traverse(2)?.value).toBe(3);
 
       // Delete from beginning
       const deleted = list.deleteAtBeginning();
       expect(deleted).toBe(2);
+
+      // Verify final state
+      expect(list.traverse(0)?.value).toBe(1);
+      expect(list.traverse(1)?.value).toBe(3);
     });
 
     it("should respect size limits throughout operations", () => {
@@ -362,6 +403,21 @@ describe("SinglyLinkedList", () => {
       list.insertAtBeginning(3);
       expect(list.deleteAtBeginning()).toBe(3);
       expect(list.traverse(0)?.value).toBe(2);
+    });
+
+    it("should handle insert and delete at end operations", () => {
+      list.insertAtEnd(1);
+      list.insertAtEnd(2);
+      list.insertAtEnd(3);
+
+      expect(list.traverse(0)?.value).toBe(1);
+      expect(list.traverse(1)?.value).toBe(2);
+      expect(list.traverse(2)?.value).toBe(3);
+
+      expect(list.deleteAtEnd()).toBe(3);
+      expect(list.deleteAtEnd()).toBe(2);
+      expect(list.deleteAtEnd()).toBe(1);
+      expect(list.isEmpty()).toBe(true);
     });
   });
 
@@ -399,6 +455,38 @@ describe("SinglyLinkedList", () => {
 
       expect(nullableList.traverse(0)?.value).toBe(1);
       expect(nullableList.traverse(1)?.value).toBe(null);
+    });
+  });
+
+  describe("Edge Cases and Boundary Conditions", () => {
+    it("should handle insertAtEnd on empty list", () => {
+      list.insertAtEnd(42);
+      expect(list.traverse(0)?.value).toBe(42);
+      expect(list.traverse()?.value).toBe(42);
+    });
+
+    it("should handle all operations on size-1 list", () => {
+      const tinyList = new SinglyLinkedList<number>(1);
+
+      tinyList.insertAtBeginning(5);
+      expect(tinyList.isFull()).toBe(true);
+
+      expect(tinyList.deleteAtEnd()).toBe(5);
+      expect(tinyList.isEmpty()).toBe(true);
+
+      tinyList.insertAtEnd(10);
+      expect(tinyList.deleteAtBeginning()).toBe(10);
+      expect(tinyList.isEmpty()).toBe(true);
+    });
+
+    it("should handle position-based operations with single element", () => {
+      list.insertAtBeginning(100);
+
+      expect(list.deleteAtMiddle(0)).toBe(100);
+      expect(list.isEmpty()).toBe(true);
+
+      list.insertAtMiddle(200, 0);
+      expect(list.traverse(0)?.value).toBe(200);
     });
   });
 });

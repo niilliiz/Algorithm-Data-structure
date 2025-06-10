@@ -31,7 +31,7 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
     }
 
     let count = 0;
-    while (count < position && currentNode?.next) {
+    while (count < position && currentNode) {
       currentNode = currentNode.next;
       count++;
     }
@@ -67,14 +67,20 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
     if (position === 0) {
       this.insertAtBeginning(value);
       return;
+    } else if (position === this.length - 1) {
+      return this.insertAtEnd(value);
     }
 
-    this.length++;
     const node = { value } as ISinglyLinkedListNode<T>;
     const prevNode = this.traverse(position - 1);
 
-    node.next = prevNode.next;
-    prevNode.next = node;
+    if (prevNode) {
+      this.length++;
+      node.next = prevNode.next;
+      prevNode.next = node;
+    } else {
+      return null;
+    }
   }
 
   insertAtEnd(value: T) {
@@ -82,9 +88,15 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return;
     }
 
-    this.length++;
+    if (this.isEmpty()) {
+      return this.insertAtBeginning(value);
+    }
+
     const node = { value } as ISinglyLinkedListNode<T>;
     const lastNode = this.traverse();
+
+    this.length++;
+
     lastNode.next = node;
     node.next = undefined;
   }
@@ -106,7 +118,11 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return;
     }
 
-    const prevNode = this.traverse(this.length - 1);
+    if (this.length === 1) {
+      return this.deleteAtBeginning();
+    }
+
+    const prevNode = this.traverse(this.length - 2);
     const lastNode = prevNode.next;
 
     prevNode.next = undefined;
@@ -120,16 +136,28 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return;
     }
 
-    if (position === this.length) {
-      this.deleteAtEnd();
+    if (position < 0 || position >= this.length) {
       return;
+    }
+
+    if (position === 0) {
+      return this.deleteAtBeginning();
+    }
+
+    if (position === this.length - 1) {
+      return this.deleteAtEnd();
     }
 
     const prevNode = this.traverse(position - 1);
     const outNode = prevNode.next;
-    prevNode.next = outNode.next;
-    this.length--;
-    return outNode.value;
+
+    if (prevNode) {
+      prevNode.next = outNode.next;
+      this.length--;
+      return outNode.value;
+    } else {
+      return null;
+    }
   }
 
   isFull(): boolean {
