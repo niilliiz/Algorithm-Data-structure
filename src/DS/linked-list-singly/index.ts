@@ -1,11 +1,8 @@
-import {
-  ISinglyLinkedList,
-  ISinglyLinkedListNode,
-} from "../../interfaces/ILinked-list";
+import { ILinkedList, ILinkedListNode } from "../../interfaces/ILinked-list";
 
-export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
+export default class SinglyLinkedList<T> implements ILinkedList<T> {
   private length: number;
-  private head: ISinglyLinkedListNode<T> | undefined;
+  private head: ILinkedListNode<T> | undefined;
   private readonly size: number;
 
   constructor(size: number) {
@@ -14,7 +11,7 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
     this.size = size;
   }
 
-  traverse(position?: number): ISinglyLinkedListNode<T> | null {
+  traverse(position?: number): ILinkedListNode<T> | null {
     if (this.isEmpty()) return null;
 
     let currentNode = this.head;
@@ -44,7 +41,7 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return;
     }
 
-    const node = { value } as ISinglyLinkedListNode<T>;
+    const node = { value } as ILinkedListNode<T>;
 
     if (this.isEmpty()) {
       this.length++;
@@ -71,7 +68,7 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return this.insertAtEnd(value);
     }
 
-    const node = { value } as ISinglyLinkedListNode<T>;
+    const node = { value } as ILinkedListNode<T>;
     const prevNode = this.traverse(position - 1);
 
     if (prevNode) {
@@ -92,7 +89,7 @@ export default class SinglyLinkedList<T> implements ISinglyLinkedList<T> {
       return this.insertAtBeginning(value);
     }
 
-    const node = { value } as ISinglyLinkedListNode<T>;
+    const node = { value } as ILinkedListNode<T>;
     const lastNode = this.traverse();
 
     this.length++;
