@@ -16,31 +16,37 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
   traverse(position?: number): ILinkedListNode<T, true> | null {
     if (this.isEmpty()) return null;
 
-    let currentNode = this.head;
-
     if (position === undefined) {
-      while (currentNode?.next) {
-        currentNode = currentNode.next;
-      }
-      return currentNode;
+      return this.tail || null;
     }
 
     if (position < 0 || position >= this.length) {
       return null;
     }
 
-    let count = 0;
-    while (count < position && currentNode) {
-      currentNode = currentNode.next;
-      count++;
-    }
+    const fromStart = position;
+    const fromEnd = this.length - 1 - position;
 
-    return currentNode;
+    if (fromStart <= fromEnd) {
+      // Traverse from head (forward)
+      let currentNode = this.head;
+      for (let i = 0; i < position && currentNode; i++) {
+        currentNode = currentNode.next;
+      }
+      return currentNode;
+    } else {
+      // Traverse from tail (backward)
+      let currentNode = this.tail;
+      for (let i = 0; i < fromEnd && currentNode; i++) {
+        currentNode = currentNode.prev;
+      }
+      return currentNode;
+    }
   }
 
   insertAtBeginning(value: T) {
     if (this.isFull()) {
-      return null;
+      return;
     }
 
     const node = { value } as ILinkedListNode<T, true>;
@@ -83,6 +89,17 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
     }
 
     const node = { value } as ILinkedListNode<T, true>;
+    const currentNode = this.traverse(position);
+
+    if (currentNode) {
+      this.length++;
+
+      node.next = currentNode;
+      node.prev = currentNode.prev;
+
+      currentNode.prev.next = node;
+      currentNode.prev = node;
+    }
   }
 
   insertAtEnd(value: T) {
