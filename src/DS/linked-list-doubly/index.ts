@@ -17,11 +17,11 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
     if (this.isEmpty()) return null;
 
     if (position === undefined) {
-      return this.tail || null;
+      return this.tail || undefined;
     }
 
     if (position < 0 || position >= this.length) {
-      return null;
+      return;
     }
 
     const fromStart = position;
@@ -62,30 +62,26 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
 
     this.length++;
 
-    const currentNode = this.head;
+    const firstNode = this.head;
     this.head = node;
-    node.next = currentNode;
+    node.next = firstNode;
     node.prev = undefined;
-    currentNode.prev = node;
+    firstNode.prev = node;
 
     return;
   }
 
   insertAtMiddle(value: T, position: number) {
     if (this.isFull()) {
-      return null;
+      return;
     }
 
     if (this.isEmpty() || position === 0) {
-      this.insertAtBeginning(value);
-
-      return;
+      return this.insertAtBeginning(value);
     }
 
     if (position === this.length) {
-      this.insertAtEnd(value);
-
-      return;
+      return this.insertAtEnd(value);
     }
 
     const node = { value } as ILinkedListNode<T, true>;
@@ -104,23 +100,90 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
 
   insertAtEnd(value: T) {
     if (this.isFull()) {
-      return null;
+      return;
     }
+
+    if (this.isEmpty()) {
+      return this.insertAtBeginning(value);
+    }
+
+    this.length++;
+
+    const node = { value } as ILinkedListNode<T, true>;
+    const lastNode = this.tail;
+    this.tail = node;
+    node.prev = lastNode;
+    lastNode.next = node;
+    node.next = undefined;
   }
 
   deleteAtBeginning(): T | undefined {
     if (this.isEmpty()) {
-      return null;
+      return;
     }
+
+    if (this.length === 1) {
+      this.length--;
+      this.head = this.tail = undefined;
+
+      return;
+    }
+
+    this.length--;
+
+    const outNode = this.head;
+    this.head = outNode.next;
+    outNode.next.prev = undefined;
+    outNode.prev = undefined;
+    outNode.next = undefined;
+
+    return outNode.value;
   }
   deleteAtEnd(): T | undefined {
     if (this.isEmpty()) {
-      return null;
+      return;
     }
+
+    if (this.length === 1) {
+      this.length--;
+      this.head = this.tail = undefined;
+
+      return;
+    }
+
+    this.length--;
+    const outNode = this.tail;
+    this.tail = outNode.prev;
+    outNode.prev.next = undefined;
+
+    outNode.next = undefined;
+    outNode.prev = undefined;
+
+    return outNode.value;
   }
   deleteAtMiddle(position: number): T | undefined {
     if (this.isEmpty()) {
-      return null;
+      return;
+    }
+
+    if (position === 0) {
+      return this.deleteAtEnd();
+    }
+
+    if (this.isFull() || position === this.length - 1) {
+      return this.deleteAtEnd();
+    }
+
+    const outNode = this.traverse(position);
+
+    if (outNode) {
+      this.length--;
+      outNode.prev.next = outNode.next;
+      outNode.next.prev = outNode.prev;
+
+      outNode.next = outNode.prev = undefined;
+
+      return outNode.value;
     }
   }
 
