@@ -124,9 +124,11 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
 
     if (this.length === 1) {
       this.length--;
+
+      const value = this.head.value;
       this.head = this.tail = undefined;
 
-      return;
+      return value;
     }
 
     this.length--;
@@ -146,9 +148,11 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
 
     if (this.length === 1) {
       this.length--;
+
+      const value = this.tail.value;
       this.head = this.tail = undefined;
 
-      return;
+      return value;
     }
 
     this.length--;
