@@ -52,17 +52,19 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
     const node = { value } as ILinkedListNode<T, true>;
 
     if (this.isEmpty()) {
-      this.head = this.tail = node;
+      this.length++;
+
+      this.head = node;
+      this.tail = node;
       node.next = undefined;
       node.prev = undefined;
 
-      this.length++;
       return;
     }
 
     this.length++;
 
-    const firstNode = this.head;
+    const firstNode = this.head!;
     this.head = node;
     node.next = firstNode;
     node.prev = undefined;
@@ -195,6 +197,12 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
     return this.size === this.length;
   }
   isEmpty(): boolean {
-    return this.length === 0;
+    return this.head === undefined;
   }
 }
+
+// const list = new DoublyLinkedList(5);
+// list.insertAtBeginning(1);
+//
+// console.log(list.isEmpty());
+// console.log(list.traverse(0));
