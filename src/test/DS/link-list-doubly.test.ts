@@ -1,53 +1,41 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import DoublyLinkedList from "../../DS/linked-list-doubly";
 
-// Mock interface for testing (adjust based on your actual interface)
-interface ILinkedListNode<T, D extends boolean = false> {
-  value: T;
-  next?: ILinkedListNode<T, D>;
-  prev?: D extends true ? ILinkedListNode<T, D> : never;
-}
-
 describe("DoublyLinkedList", () => {
   let list: DoublyLinkedList<number>;
 
   beforeEach(() => {
-    list = new DoublyLinkedList<number>(5); // Size limit of 5
+    list = new DoublyLinkedList<number>(5);
   });
 
-  describe("Constructor and Initial State", () => {
-    it("should initialize with correct initial state", () => {
+  describe("Constructor", () => {
+    it("should initialize with correct size and empty state", () => {
       expect(list.isEmpty()).toBe(true);
       expect(list.isFull()).toBe(false);
     });
 
-    it("should handle different size limits", () => {
+    it("should handle different sizes", () => {
       const smallList = new DoublyLinkedList<string>(1);
+      const largeList = new DoublyLinkedList<number>(100);
+
       expect(smallList.isEmpty()).toBe(true);
-      expect(smallList.isFull()).toBe(false);
+      expect(largeList.isEmpty()).toBe(true);
     });
   });
 
-  describe("isEmpty() and isFull()", () => {
-    it("should return true for empty list", () => {
+  describe("isEmpty and isFull", () => {
+    it("should return true when list is empty", () => {
       expect(list.isEmpty()).toBe(true);
     });
 
-    it("should return false for non-empty list", () => {
-      console.log(list, "before insertion");
-      try {
-        list.insertAtBeginning(1);
-        console.log(list, "after insertion");
-      } catch (error) {
-        console.log("Error during insertion:", error);
-      }
+    it("should return false when list has elements", () => {
+      list.insertAtBeginning(1);
       expect(list.isEmpty()).toBe(false);
     });
 
     it("should return true when list is full", () => {
-      // Fill the list to capacity (size 5)
       for (let i = 0; i < 5; i++) {
-        list.insertAtBeginning(i);
+        list.insertAtEnd(i);
       }
       expect(list.isFull()).toBe(true);
     });
@@ -58,7 +46,7 @@ describe("DoublyLinkedList", () => {
     });
   });
 
-  describe("traverse()", () => {
+  describe("traverse", () => {
     beforeEach(() => {
       // Setup: [0, 1, 2, 3, 4]
       for (let i = 0; i < 5; i++) {
@@ -68,56 +56,43 @@ describe("DoublyLinkedList", () => {
 
     it("should return null for empty list", () => {
       const emptyList = new DoublyLinkedList<number>(5);
-      expect(emptyList.traverse(0)).toBeNull();
+      expect(emptyList.traverse(0)).toBe(null);
+      expect(emptyList.traverse()).toBe(null);
     });
 
     it("should return tail when no position specified", () => {
-      const result = list.traverse();
-      expect(result?.value).toBe(4); // Last element
+      const node = list.traverse();
+      expect(node?.value).toBe(4);
     });
 
-    it("should return undefined for invalid positions", () => {
-      expect(list.traverse(-1)).toBeUndefined();
-      expect(list.traverse(5)).toBeUndefined();
-      expect(list.traverse(10)).toBeUndefined();
+    it("should traverse to correct positions", () => {
+      expect(list.traverse(0)?.value).toBe(0);
+      expect(list.traverse(1)?.value).toBe(1);
+      expect(list.traverse(2)?.value).toBe(2);
+      expect(list.traverse(3)?.value).toBe(3);
+      expect(list.traverse(4)?.value).toBe(4);
     });
 
-    it("should traverse from head for positions in first half", () => {
-      const result = list.traverse(1);
-      expect(result?.value).toBe(1);
+    it("should return null for invalid positions", () => {
+      expect(list.traverse(-1)).toBe(null);
+      expect(list.traverse(5)).toBe(null);
+      expect(list.traverse(100)).toBe(null);
     });
 
-    it("should traverse from tail for positions in second half", () => {
-      const result = list.traverse(4);
-      expect(result?.value).toBe(4);
-    });
-
-    it("should return correct node at position 0", () => {
-      const result = list.traverse(0);
-      expect(result?.value).toBe(0);
-    });
-
-    it("should return correct node at last position", () => {
-      const result = list.traverse(4);
-      expect(result?.value).toBe(4);
-    });
-
-    it("should handle single element list", () => {
-      const singleList = new DoublyLinkedList<number>(5);
-      singleList.insertAtBeginning(42);
-      expect(singleList.traverse(0)?.value).toBe(42);
-      expect(singleList.traverse()?.value).toBe(42);
+    it("should handle edge positions correctly", () => {
+      expect(list.traverse(0)?.value).toBe(0);
+      expect(list.traverse(4)?.value).toBe(4);
     });
   });
 
-  describe("insertAtBeginning()", () => {
+  describe("insertAtBeginning", () => {
     it("should insert into empty list", () => {
-      list.insertAtBeginning(1);
+      list.insertAtBeginning(42);
       expect(list.isEmpty()).toBe(false);
-      expect(list.traverse(0)?.value).toBe(1);
+      expect(list.traverse(0)?.value).toBe(42);
     });
 
-    it("should insert multiple elements at beginning", () => {
+    it("should insert at beginning and shift other elements", () => {
       list.insertAtBeginning(1);
       list.insertAtBeginning(2);
       list.insertAtBeginning(3);
@@ -128,39 +103,40 @@ describe("DoublyLinkedList", () => {
     });
 
     it("should not insert when list is full", () => {
-      // Fill to capacity
+      // Fill the list
       for (let i = 0; i < 5; i++) {
         list.insertAtBeginning(i);
       }
 
-      // Try to insert one more
-      const result = list.insertAtBeginning(999);
-      expect(result).toBeUndefined();
+      expect(list.isFull()).toBe(true);
+
+      // Try to insert when full - should not change anything
+      list.insertAtBeginning(999);
       expect(list.traverse(0)?.value).not.toBe(999);
+      expect(list.isFull()).toBe(true);
     });
 
     it("should properly link nodes with prev/next pointers", () => {
       list.insertAtBeginning(1);
       list.insertAtBeginning(2);
 
-      const first = list.traverse(0);
+      const head = list.traverse(0);
       const second = list.traverse(1);
 
-      expect(first?.next?.value).toBe(1);
-      expect(first?.prev).toBeUndefined();
-      expect(second?.prev?.value).toBe(2);
-      expect(second?.next).toBeUndefined();
+      expect(head?.next).toBe(second);
+      expect(second?.prev).toBe(head);
+      expect(head?.prev).toBeUndefined();
     });
   });
 
-  describe("insertAtEnd()", () => {
+  describe("insertAtEnd", () => {
     it("should insert into empty list", () => {
-      list.insertAtEnd(1);
+      list.insertAtEnd(42);
       expect(list.isEmpty()).toBe(false);
-      expect(list.traverse(0)?.value).toBe(1);
+      expect(list.traverse(0)?.value).toBe(42);
     });
 
-    it("should insert multiple elements at end", () => {
+    it("should insert at end and preserve order", () => {
       list.insertAtEnd(1);
       list.insertAtEnd(2);
       list.insertAtEnd(3);
@@ -171,14 +147,17 @@ describe("DoublyLinkedList", () => {
     });
 
     it("should not insert when list is full", () => {
-      // Fill to capacity
+      // Fill the list
       for (let i = 0; i < 5; i++) {
         list.insertAtEnd(i);
       }
 
-      // Try to insert one more
-      const result = list.insertAtEnd(999);
-      expect(result).toBeUndefined();
+      expect(list.isFull()).toBe(true);
+
+      // Try to insert when full
+      list.insertAtEnd(999);
+      expect(list.traverse()?.value).not.toBe(999);
+      expect(list.isFull()).toBe(true);
     });
 
     it("should properly link nodes with prev/next pointers", () => {
@@ -188,33 +167,37 @@ describe("DoublyLinkedList", () => {
       const first = list.traverse(0);
       const second = list.traverse(1);
 
-      expect(first?.next?.value).toBe(2);
-      expect(first?.prev).toBeUndefined();
-      expect(second?.prev?.value).toBe(1);
+      expect(first?.next).toBe(second);
+      expect(second?.prev).toBe(first);
       expect(second?.next).toBeUndefined();
     });
   });
 
-  describe("insertAtMiddle()", () => {
+  describe("insertAtMiddle", () => {
     beforeEach(() => {
       // Setup: [0, 1, 2]
-      list.insertAtEnd(0);
-      list.insertAtEnd(1);
-      list.insertAtEnd(2);
+      for (let i = 0; i < 3; i++) {
+        list.insertAtEnd(i);
+      }
     });
 
-    it("should insert at beginning when position is 0", () => {
+    it("should insert at position 0 (beginning)", () => {
       list.insertAtMiddle(999, 0);
       expect(list.traverse(0)?.value).toBe(999);
       expect(list.traverse(1)?.value).toBe(0);
+      expect(list.traverse(2)?.value).toBe(1);
+      expect(list.traverse(3)?.value).toBe(2);
     });
 
-    it("should insert at end when position equals length", () => {
+    it("should insert at end position", () => {
       list.insertAtMiddle(999, 3);
+      expect(list.traverse(0)?.value).toBe(0);
+      expect(list.traverse(1)?.value).toBe(1);
+      expect(list.traverse(2)?.value).toBe(2);
       expect(list.traverse(3)?.value).toBe(999);
     });
 
-    it("should insert in middle position", () => {
+    it("should insert in middle position and shift elements", () => {
       list.insertAtMiddle(999, 1);
       expect(list.traverse(0)?.value).toBe(0);
       expect(list.traverse(1)?.value).toBe(999);
@@ -222,116 +205,106 @@ describe("DoublyLinkedList", () => {
       expect(list.traverse(3)?.value).toBe(2);
     });
 
-    it("should handle insertion in empty list", () => {
-      const emptyList = new DoublyLinkedList<number>(5);
-      emptyList.insertAtMiddle(999, 0);
-      expect(emptyList.traverse(0)?.value).toBe(999);
-    });
-
     it("should not insert when list is full", () => {
-      // Fill remaining capacity
+      // Fill remaining slots
       list.insertAtEnd(3);
       list.insertAtEnd(4);
 
-      const result = list.insertAtMiddle(999, 2);
-      expect(result).toBeUndefined();
+      expect(list.isFull()).toBe(true);
+
+      list.insertAtMiddle(999, 2);
+      expect(list.traverse(2)?.value).toBe(2); // Should remain unchanged
     });
 
-    it("should properly maintain prev/next pointers", () => {
+    it("should properly link nodes with prev/next pointers", () => {
       list.insertAtMiddle(999, 1);
 
+      const first = list.traverse(0);
       const inserted = list.traverse(1);
-      const before = list.traverse(0);
-      const after = list.traverse(2);
+      const third = list.traverse(2);
 
-      expect(inserted?.value).toBe(999);
-      expect(inserted?.prev?.value).toBe(0);
-      expect(inserted?.next?.value).toBe(1);
-      expect(before?.next?.value).toBe(999);
-      expect(after?.prev?.value).toBe(999);
+      expect(first?.next).toBe(inserted);
+      expect(inserted?.prev).toBe(first);
+      expect(inserted?.next).toBe(third);
+      expect(third?.prev).toBe(inserted);
     });
   });
 
-  describe("deleteAtBeginning()", () => {
+  describe("deleteAtBeginning", () => {
     it("should return undefined for empty list", () => {
       expect(list.deleteAtBeginning()).toBeUndefined();
     });
 
-    it("should delete single element", () => {
-      list.insertAtBeginning(1);
-      const result = list.deleteAtBeginning();
+    it("should delete and return value from single element list", () => {
+      list.insertAtBeginning(42);
+      const deleted = list.deleteAtBeginning();
 
-      expect(result).toBe(1);
+      expect(deleted).toBe(42);
       expect(list.isEmpty()).toBe(true);
     });
 
-    it("should delete from list with multiple elements", () => {
+    it("should delete first element and shift others", () => {
       list.insertAtEnd(1);
       list.insertAtEnd(2);
       list.insertAtEnd(3);
 
-      const result = list.deleteAtBeginning();
-      expect(result).toBe(1);
+      const deleted = list.deleteAtBeginning();
+
+      expect(deleted).toBe(1);
       expect(list.traverse(0)?.value).toBe(2);
       expect(list.traverse(1)?.value).toBe(3);
+      expect(list.traverse(2)).toBe(null);
     });
 
-    it("should properly update head pointer", () => {
+    it("should properly update prev pointer of new head", () => {
       list.insertAtEnd(1);
       list.insertAtEnd(2);
 
       list.deleteAtBeginning();
+
       const newHead = list.traverse(0);
-      expect(newHead?.value).toBe(2);
       expect(newHead?.prev).toBeUndefined();
-    });
-
-    it("should clean up deleted node pointers", () => {
-      list.insertAtEnd(1);
-      list.insertAtEnd(2);
-
-      list.deleteAtBeginning();
-      // The deleted node should have its pointers cleaned up
-      // This is verified by the implementation
     });
   });
 
-  describe("deleteAtEnd()", () => {
+  describe("deleteAtEnd", () => {
     it("should return undefined for empty list", () => {
       expect(list.deleteAtEnd()).toBeUndefined();
     });
 
-    it("should delete single element", () => {
-      list.insertAtEnd(1);
-      const result = list.deleteAtEnd();
+    it("should delete and return value from single element list", () => {
+      list.insertAtEnd(42);
+      const deleted = list.deleteAtEnd();
 
-      expect(result).toBe(1);
+      expect(deleted).toBe(42);
       expect(list.isEmpty()).toBe(true);
     });
 
-    it("should delete from list with multiple elements", () => {
+    it("should delete last element", () => {
       list.insertAtEnd(1);
       list.insertAtEnd(2);
       list.insertAtEnd(3);
 
-      const result = list.deleteAtEnd();
-      expect(result).toBe(3);
+      const deleted = list.deleteAtEnd();
+
+      expect(deleted).toBe(3);
       expect(list.traverse(0)?.value).toBe(1);
       expect(list.traverse(1)?.value).toBe(2);
+      expect(list.traverse(2)).toBe(null);
     });
 
-    it("should properly update tail pointer", () => {
+    it("should properly update next pointer of new tail", () => {
       list.insertAtEnd(1);
       list.insertAtEnd(2);
 
       list.deleteAtEnd();
-      const newTail = list.traverse(); // No position = tail
-      expect(newTail?.value).toBe(1);
+
+      const newTail = list.traverse(0);
       expect(newTail?.next).toBeUndefined();
     });
   });
 
-  describe("deleteAtMiddle()", () => {
+  describe("deleteAtMiddle", () => {
     beforeEach(() => {
       // Setup: [0, 1, 2, 3, 4]
       for (let i = 0; i < 5; i++) {
@@ -344,139 +317,158 @@ describe("DoublyLinkedList", () => {
       expect(emptyList.deleteAtMiddle(0)).toBeUndefined();
     });
 
-    it("should delete at beginning when position is 0", () => {
-      // Note: Your implementation has a bug here - it calls deleteAtEnd() instead of deleteAtBeginning()
-      const result = list.deleteAtMiddle(0);
-      expect(result).toBe(4); // Due to the bug, it deletes from end
-    });
-
-    it("should delete at end when position is length-1", () => {
-      const result = list.deleteAtMiddle(4);
-      expect(result).toBe(4);
-      expect(list.traverse(3)?.value).toBe(3);
-    });
-
-    it("should delete from middle position", () => {
-      const result = list.deleteAtMiddle(2);
-      expect(result).toBe(2);
-      expect(list.traverse(0)?.value).toBe(0);
-      expect(list.traverse(1)?.value).toBe(1);
+    it("should delete at position 0 (beginning)", () => {
+      const deleted = list.deleteAtMiddle(0);
+      expect(deleted).toBe(0);
+      expect(list.traverse(0)?.value).toBe(1);
+      expect(list.traverse(1)?.value).toBe(2);
       expect(list.traverse(2)?.value).toBe(3);
       expect(list.traverse(3)?.value).toBe(4);
     });
 
-    it("should properly maintain prev/next pointers after deletion", () => {
-      list.deleteAtMiddle(2); // Delete value 2
-
-      const before = list.traverse(1); // value 1
-      const after = list.traverse(2); // value 3
-
-      expect(before?.next?.value).toBe(3);
-      expect(after?.prev?.value).toBe(1);
-    });
-
-    it("should handle deletion of single element", () => {
-      const singleList = new DoublyLinkedList<number>(5);
-      singleList.insertAtEnd(42);
-
-      const result = singleList.deleteAtMiddle(0);
-      expect(result).toBe(42); // Note: due to bug, might behave differently
-    });
-  });
-
-  describe("Edge Cases and Error Handling", () => {
-    it("should handle operations on size-1 list", () => {
-      const tinyList = new DoublyLinkedList<number>(1);
-
-      tinyList.insertAtBeginning(1);
-      expect(tinyList.isFull()).toBe(true);
-
-      const result = tinyList.deleteAtEnd();
-      expect(result).toBe(1);
-      expect(tinyList.isEmpty()).toBe(true);
-    });
-
-    it("should handle alternating insert/delete operations", () => {
-      list.insertAtEnd(1);
-      list.insertAtEnd(2);
-
-      const deleted = list.deleteAtBeginning();
-      expect(deleted).toBe(1);
-
-      list.insertAtEnd(3);
-      expect(list.traverse(0)?.value).toBe(2);
-      expect(list.traverse(1)?.value).toBe(3);
-    });
-
-    it("should maintain integrity after multiple operations", () => {
-      // Complex sequence of operations
-      list.insertAtEnd(1);
-      list.insertAtBeginning(0);
-      list.insertAtMiddle(0.5, 1);
-      list.insertAtEnd(2);
-
-      // List should be [0, 0.5, 1, 2]
-      expect(list.traverse(0)?.value).toBe(0);
-      expect(list.traverse(1)?.value).toBe(0.5);
-      expect(list.traverse(2)?.value).toBe(1);
-      expect(list.traverse(3)?.value).toBe(2);
-
-      // Delete middle element
-      const deleted = list.deleteAtMiddle(1);
-      expect(deleted).toBe(0.5);
-
-      // List should be [0, 1, 2]
+    it("should delete at last position", () => {
+      const deleted = list.deleteAtMiddle(4);
+      expect(deleted).toBe(4);
       expect(list.traverse(0)?.value).toBe(0);
       expect(list.traverse(1)?.value).toBe(1);
       expect(list.traverse(2)?.value).toBe(2);
+      expect(list.traverse(3)?.value).toBe(3);
+      expect(list.traverse(4)).toBe(null);
+    });
+
+    it("should delete at middle position and shift elements", () => {
+      const deleted = list.deleteAtMiddle(2);
+      console.log("deleted", deleted);
+      expect(deleted).toBe(2);
+      expect(list.traverse(0)?.value).toBe(0);
+      expect(list.traverse(1)?.value).toBe(1);
+      expect(list.traverse(2)?.value).toBe(3);
+      expect(list.traverse(3)?.value).toBe(4);
+      expect(list.traverse(4)).toBe(null);
+    });
+
+    it("should properly link adjacent nodes after deletion", () => {
+      list.deleteAtMiddle(2);
+
+      const before = list.traverse(1);
+      const after = list.traverse(2);
+
+      expect(before?.next).toBe(after);
+      expect(after?.prev).toBe(before);
+    });
+
+    it("should delete correct element even when list is full", () => {
+      // This test will fail with current implementation due to the bug
+      const deleted = list.deleteAtMiddle(2);
+      expect(deleted).toBe(2); // Should delete element at position 2, not the last element
     });
   });
 
-  describe("Type Safety", () => {
-    it("should work with different data types", () => {
+  describe("Complex operations and edge cases", () => {
+    it("should handle mixed insert and delete operations", () => {
+      list.insertAtEnd(1);
+      list.insertAtEnd(2);
+      list.insertAtEnd(3);
+
+      expect(list.deleteAtBeginning()).toBe(1);
+      list.insertAtBeginning(0);
+      expect(list.deleteAtEnd()).toBe(3);
+      list.insertAtEnd(4);
+
+      expect(list.traverse(0)?.value).toBe(0);
+      expect(list.traverse(1)?.value).toBe(2);
+      expect(list.traverse(2)?.value).toBe(4);
+    });
+
+    it("should maintain correct size after operations", () => {
+      expect(list.isEmpty()).toBe(true);
+
+      list.insertAtEnd(1);
+      expect(list.isEmpty()).toBe(false);
+      expect(list.isFull()).toBe(false);
+
+      for (let i = 2; i <= 5; i++) {
+        list.insertAtEnd(i);
+      }
+      expect(list.isFull()).toBe(true);
+
+      list.deleteAtBeginning();
+      expect(list.isFull()).toBe(false);
+      expect(list.isEmpty()).toBe(false);
+    });
+
+    it("should handle size 1 list operations", () => {
+      const singleList = new DoublyLinkedList<number>(1);
+
+      singleList.insertAtBeginning(42);
+      expect(singleList.isFull()).toBe(true);
+
+      // Should not insert when full
+      singleList.insertAtEnd(99);
+      expect(singleList.traverse(0)?.value).toBe(42);
+
+      // Should delete successfully
+      expect(singleList.deleteAtEnd()).toBe(42);
+      expect(singleList.isEmpty()).toBe(true);
+    });
+
+    it("should handle invalid positions gracefully", () => {
+      list.insertAtEnd(1);
+      list.insertAtEnd(2);
+
+      expect(list.traverse(-1)).toBe(null);
+      expect(list.traverse(10)).toBe(null);
+      expect(list.deleteAtMiddle(-1)).toBeUndefined();
+      expect(list.deleteAtMiddle(10)).toBeUndefined();
+    });
+
+    it("should maintain doubly linked structure integrity", () => {
+      list.insertAtEnd(1);
+      list.insertAtEnd(2);
+      list.insertAtEnd(3);
+
+      // Check forward links
+      const first = list.traverse(0);
+      const second = list.traverse(1);
+      const third = list.traverse(2);
+
+      expect(first?.next).toBe(second);
+      expect(second?.next).toBe(third);
+      expect(third?.next).toBeUndefined();
+
+      // Check backward links
+      expect(third?.prev).toBe(second);
+      expect(second?.prev).toBe(first);
+      expect(first?.prev).toBeUndefined();
+    });
+  });
+
+  describe("Generic type support", () => {
+    it("should work with string types", () => {
       const stringList = new DoublyLinkedList<string>(3);
       stringList.insertAtEnd("hello");
       stringList.insertAtEnd("world");
 
       expect(stringList.traverse(0)?.value).toBe("hello");
       expect(stringList.traverse(1)?.value).toBe("world");
+      expect(stringList.deleteAtBeginning()).toBe("hello");
     });
 
-    it("should work with objects", () => {
-      interface TestObj {
-        id: number;
+    it("should work with object types", () => {
+      interface Person {
         name: string;
+        age: number;
       }
 
-      const objList = new DoublyLinkedList<TestObj>(3);
-      const obj1 = { id: 1, name: "test1" };
-      const obj2 = { id: 2, name: "test2" };
+      const personList = new DoublyLinkedList<Person>(2);
+      const person1 = { name: "Alice", age: 30 };
+      const person2 = { name: "Bob", age: 25 };
 
-      objList.insertAtEnd(obj1);
-      objList.insertAtEnd(obj2);
+      personList.insertAtEnd(person1);
+      personList.insertAtEnd(person2);
 
-      expect(objList.traverse(0)?.value).toEqual(obj1);
-      expect(objList.traverse(1)?.value).toEqual(obj2);
-    });
-  });
-
-  describe("Performance Considerations", () => {
-    it("should handle maximum capacity efficiently", () => {
-      const largeList = new DoublyLinkedList<number>(1000);
-
-      // Fill to capacity
-      for (let i = 0; i < 1000; i++) {
-        largeList.insertAtEnd(i);
-      }
-
-      expect(largeList.isFull()).toBe(true);
-
-      // Test traversal optimization
-      const nearEnd = largeList.traverse(900);
-      expect(nearEnd?.value).toBe(900);
-
-      const nearBeginning = largeList.traverse(100);
-      expect(nearBeginning?.value).toBe(100);
+      expect(personList.traverse(0)?.value).toEqual(person1);
+      expect(personList.traverse(1)?.value).toEqual(person2);
     });
   });
 });

@@ -21,7 +21,7 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
     }
 
     if (position < 0 || position >= this.length) {
-      return;
+      return null;
     }
 
     const fromStart = position;
@@ -167,16 +167,17 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
 
     return outNode.value;
   }
+
   deleteAtMiddle(position: number): T | undefined {
     if (this.isEmpty()) {
       return;
     }
 
     if (position === 0) {
-      return this.deleteAtEnd();
+      return this.deleteAtBeginning();
     }
 
-    if (this.isFull() || position === this.length - 1) {
+    if (position === this.length - 1) {
       return this.deleteAtEnd();
     }
 
@@ -184,6 +185,7 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
 
     if (outNode) {
       this.length--;
+
       outNode.prev.next = outNode.next;
       outNode.next.prev = outNode.prev;
 
@@ -200,9 +202,3 @@ export default class DoublyLinkedList<T> implements ILinkedList<T, true> {
     return this.head === undefined;
   }
 }
-
-// const list = new DoublyLinkedList(5);
-// list.insertAtBeginning(1);
-//
-// console.log(list.isEmpty());
-// console.log(list.traverse(0));
