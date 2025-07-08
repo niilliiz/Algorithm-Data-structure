@@ -48,7 +48,6 @@ describe("DoublyLinkedList", () => {
 
   describe("traverse", () => {
     beforeEach(() => {
-      // Setup: [0, 1, 2, 3, 4]
       for (let i = 0; i < 5; i++) {
         list.insertAtEnd(i);
       }
@@ -103,14 +102,12 @@ describe("DoublyLinkedList", () => {
     });
 
     it("should not insert when list is full", () => {
-      // Fill the list
       for (let i = 0; i < 5; i++) {
         list.insertAtBeginning(i);
       }
 
       expect(list.isFull()).toBe(true);
 
-      // Try to insert when full - should not change anything
       list.insertAtBeginning(999);
       expect(list.traverse(0)?.value).not.toBe(999);
       expect(list.isFull()).toBe(true);
@@ -147,14 +144,12 @@ describe("DoublyLinkedList", () => {
     });
 
     it("should not insert when list is full", () => {
-      // Fill the list
       for (let i = 0; i < 5; i++) {
         list.insertAtEnd(i);
       }
 
       expect(list.isFull()).toBe(true);
 
-      // Try to insert when full
       list.insertAtEnd(999);
       expect(list.traverse()?.value).not.toBe(999);
       expect(list.isFull()).toBe(true);
@@ -175,7 +170,6 @@ describe("DoublyLinkedList", () => {
 
   describe("insertAtMiddle", () => {
     beforeEach(() => {
-      // Setup: [0, 1, 2]
       for (let i = 0; i < 3; i++) {
         list.insertAtEnd(i);
       }
@@ -206,7 +200,6 @@ describe("DoublyLinkedList", () => {
     });
 
     it("should not insert when list is full", () => {
-      // Fill remaining slots
       list.insertAtEnd(3);
       list.insertAtEnd(4);
 
@@ -306,7 +299,6 @@ describe("DoublyLinkedList", () => {
 
   describe("deleteAtMiddle", () => {
     beforeEach(() => {
-      // Setup: [0, 1, 2, 3, 4]
       for (let i = 0; i < 5; i++) {
         list.insertAtEnd(i);
       }
@@ -358,7 +350,6 @@ describe("DoublyLinkedList", () => {
     });
 
     it("should delete correct element even when list is full", () => {
-      // This test will fail with current implementation due to the bug
       const deleted = list.deleteAtMiddle(2);
       expect(deleted).toBe(2); // Should delete element at position 2, not the last element
     });
@@ -403,11 +394,9 @@ describe("DoublyLinkedList", () => {
       singleList.insertAtBeginning(42);
       expect(singleList.isFull()).toBe(true);
 
-      // Should not insert when full
       singleList.insertAtEnd(99);
       expect(singleList.traverse(0)?.value).toBe(42);
 
-      // Should delete successfully
       expect(singleList.deleteAtEnd()).toBe(42);
       expect(singleList.isEmpty()).toBe(true);
     });
@@ -427,7 +416,6 @@ describe("DoublyLinkedList", () => {
       list.insertAtEnd(2);
       list.insertAtEnd(3);
 
-      // Check forward links
       const first = list.traverse(0);
       const second = list.traverse(1);
       const third = list.traverse(2);
@@ -436,7 +424,6 @@ describe("DoublyLinkedList", () => {
       expect(second?.next).toBe(third);
       expect(third?.next).toBeUndefined();
 
-      // Check backward links
       expect(third?.prev).toBe(second);
       expect(second?.prev).toBe(first);
       expect(first?.prev).toBeUndefined();
