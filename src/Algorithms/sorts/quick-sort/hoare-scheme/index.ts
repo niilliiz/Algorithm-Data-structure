@@ -25,23 +25,9 @@ function quickSort(arr: number[], lo: number, hi: number) {
   quickSort(arr, pivotIndex + 1, hi);
 }
 
-export default function QuickSortLomutoScheme(arr: number[]): number[] {
+export default function QuickSortHoareScheme(arr: number[]): number[] {
   if (arr.length <= 1) return arr;
 
   quickSort(arr, 0, arr.length - 1);
   return arr;
 }
-
-//Pivot = arr[low]
-//
-// i starts at low - 1, j starts at high + 1
-//
-// While i < j, move:
-//
-// i++ until arr[i] ≥ pivot
-//
-// j-- until arr[j] ≤ pivot
-//
-// Swap if i < j
-//
-// Ends
