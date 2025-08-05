@@ -1,28 +1,32 @@
 function partition(arr: number[], lo: number, hi: number): number {
-  const pivot = arr[hi];
+  const pivot = arr[lo];
   let i = lo - 1;
-  let j = lo;
+  let j = hi + 1;
 
-  while (j <= hi) {
-    if (arr[j] <= pivot) {
+  while (true) {
+    do {
       i++;
-      [arr[j], arr[i]] = [arr[i], arr[j]];
-    }
-    j++;
-  }
+    } while (arr[i] < pivot);
 
-  return i;
+    do {
+      j--;
+    } while (arr[j] > pivot);
+
+    if (i >= j) {
+      return j;
+    }
+
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
 }
 
 function quickSort(arr: number[], lo: number, hi: number) {
-  if (lo >= hi) {
-    return arr;
+  if (lo < hi) {
+    const index = partition(arr, lo, hi);
+
+    quickSort(arr, lo, index);
+    quickSort(arr, index + 1, hi);
   }
-
-  const pivotIndex = partition(arr, lo, hi);
-
-  quickSort(arr, lo, pivotIndex - 1);
-  quickSort(arr, pivotIndex + 1, hi);
 }
 
 export default function QuickSortHoareScheme(arr: number[]): number[] {
