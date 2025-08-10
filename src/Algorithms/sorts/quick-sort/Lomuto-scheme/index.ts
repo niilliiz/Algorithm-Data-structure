@@ -1,4 +1,4 @@
-function partition(arr: number[], lo: number, hi: number): number {
+function lomutoPartition(arr: number[], lo: number, hi: number): number {
   const pivot = arr[hi];
   let i = lo - 1;
   let j = lo;
@@ -19,7 +19,7 @@ function quickSort(arr: number[], lo: number, hi: number) {
     return arr;
   }
 
-  const pivotIndex = partition(arr, lo, hi);
+  const pivotIndex = lomutoPartition(arr, lo, hi);
 
   quickSort(arr, lo, pivotIndex - 1);
   quickSort(arr, pivotIndex + 1, hi);
