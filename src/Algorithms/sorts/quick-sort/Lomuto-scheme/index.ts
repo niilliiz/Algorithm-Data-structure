@@ -31,17 +31,3 @@ export default function QuickSortLomutoScheme(arr: number[]): number[] {
   quickSort(arr, 0, arr.length - 1);
   return arr;
 }
-
-//Pivot = arr[low]
-//
-// i starts at low - 1, j starts at high + 1
-//
-// While i < j, move:
-//
-// i++ until arr[i] ≥ pivot
-//
-// j-- until arr[j] ≤ pivot
-//
-// Swap if i < j
-//
-// Ends
