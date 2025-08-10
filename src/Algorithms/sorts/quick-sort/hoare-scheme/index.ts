@@ -1,4 +1,4 @@
-function hoarePartition(arr: number[], lo: number, hi: number): number {
+export function hoarePartition(arr: number[], lo: number, hi: number): number {
   const pivot = arr[lo];
   let i = lo - 1;
   let j = hi + 1;
