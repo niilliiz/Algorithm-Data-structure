@@ -2,8 +2,8 @@
 
 ### Time Complexity
 Time Complexity
-- Best Case: `O(log n)` - Happens when the pivot splits the array evenly (or close to it)
-- Average Case: `O(log n)` - Random distribution of elements
+- Best Case: `O(nlog n)` - Happens when the pivot splits the array evenly (or close to it)
+- Average Case: `O(nlog n)` - Random distribution of elements
 - Worst Case: `O(n²)` - Happens when the pivot always gives the most unbalanced split, like: Choosing the first element as pivot in a sorted or reverse-sorted array, One side has n - 1 elements and the other has 0
 
 
