@@ -3,14 +3,16 @@
 ### Time Complexity
 Time Complexity
 All Cases: O(n²)
-- Best Case: `O(n²)` - Even if the array is already sorted, the algorithm still needs to compare every element with every other element to find the minimum
-- Average Case: `O(n²)` - Random distribution of elements
-- Worst Case: `O(n²)` - Reverse sorted array
+- Best Case: `O(nlogn)` - This happens when the pivot splits the array into two nearly equal halves each time. The median-of-three pivot selection helps increase the likelihood of balanced partitions.
+- Average Case: `O(nlogn)` - Random input + median-of-three → better balance than picking the first or last element as pivot
+- Worst Case: `O(n²)` - Still possible if the array is already sorted in such a way that the median-of-three picks poor pivots (e.g., all equal elements). 
 
 
 
 ### Space Complexity
-- `O(1)` - Constant Space
+- `O(logn)`: Quicksort is in-place, so no extra arrays are created (partitioning swaps elements in place).
+The only extra space comes from the recursion call stack, which in the best/average case is `O(logn)` deep.
+In the worst case (degenerate splits), recursion depth can go to `O(n)`.
 
 ### Details
 Median-Of-Three Partition Scheme
