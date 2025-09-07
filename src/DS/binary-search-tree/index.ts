@@ -36,6 +36,18 @@ export class BinarySearchTree<T> implements IBinarySearchTree<T> {
     this.root = this.deleteNode(this.root, value);
   }
 
+  private findInorderSuccessor(node: IBinaryTreeNode<T> | null): T | null {
+    if (node === null) {
+      return null;
+    }
+
+    if (node.left) {
+      return this.findInorderSuccessor(node.left);
+    } else {
+      return node.value;
+    }
+  }
+
   private deleteNode(
     node: IBinaryTreeNode<T> | null,
     value: T,
@@ -57,6 +69,10 @@ export class BinarySearchTree<T> implements IBinarySearchTree<T> {
         return node.left ?? node.right;
       } else if (node.left !== null && node.right !== null) {
         // two children
+        const inorderSuccessor = this.findInorderSuccessor(node.right);
+        node.value = inorderSuccessor;
+        node.right = this.deleteNode(node.right, inorderSuccessor);
+        return node;
       }
     } else {
       if (value < node.value) {
