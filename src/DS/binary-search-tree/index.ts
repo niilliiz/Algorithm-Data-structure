@@ -32,6 +32,40 @@ export class BinarySearchTree<T> implements IBinarySearchTree<T> {
   delete(value: T): T | undefined {
     if (this.isEmpty()) return undefined;
     // TODO: Implement deletion logic
+
+    this.root = this.deleteNode(this.root, value);
+  }
+
+  private deleteNode(
+    node: IBinaryTreeNode<T> | null,
+    value: T,
+  ): IBinaryTreeNode<T> {
+    if (node === null) {
+      return node;
+    }
+
+    if (node.value === value) {
+      // found the node
+      if (node.left === null && node.right === null) {
+        // no child
+        return null;
+      } else if (
+        (node.left !== null && node.right === null) ||
+        (node.left === null && node.right !== null)
+      ) {
+        // one child
+        return node.left ?? node.right;
+      } else if (node.left !== null && node.right !== null) {
+        // two children
+      }
+    } else {
+      if (value < node.value) {
+        node.left = this.deleteNode(node.left, value);
+      } else {
+        node.right = this.deleteNode(node.right, value);
+      }
+      return node;
+    }
   }
 
   search(value: T): T | undefined {

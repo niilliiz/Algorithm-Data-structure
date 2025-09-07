@@ -1,5 +1,5 @@
 export interface IBinaryTreeNode<T> {
-  readonly value: T;
+  value: T;
   left: IBinaryTreeNode<T> | null;
   right: IBinaryTreeNode<T> | null;
 }
