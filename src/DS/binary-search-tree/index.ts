@@ -1,7 +1,7 @@
 import { IBinarySearchTree } from "../../interfaces/IBinary-Search-Tree";
 import { IBinaryTreeNode } from "../../interfaces/IBinary-Tree-Node";
 
-export class BinarySearchTree<T> {
+export class BinarySearchTree<T> implements IBinarySearchTree<T> {
   private root: IBinaryTreeNode<T> | null;
 
   constructor() {
