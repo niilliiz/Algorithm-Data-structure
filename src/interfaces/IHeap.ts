@@ -4,4 +4,6 @@ export interface IHeap<T> {
   peek(): T | undefined;
   heapifyDown(array: T[]): void;
   buildHeap(array: T[]): void; // heapify
+  size(): number;
+  isEmpty(): boolean;
 }
