@@ -9,3 +9,8 @@ node_modules
 !*.config.js
 !vite.config.js
 !jest.config.js
+
+# Code/IDE
+qodana.yaml
+
+*.yaml
