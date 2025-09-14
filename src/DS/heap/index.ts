@@ -28,7 +28,7 @@ export class Heap<T> implements IHeap<T> {
     let i = currIndex;
 
     while (i > 0) {
-      const parentIndex = Math.floor((currIndex - 1) / 2);
+      const parentIndex = Math.floor((i - 1) / 2);
 
       if (this.data[parentIndex] > this.data[currIndex]) {
         [this.data[parentIndex], this.data[currIndex]] = [
