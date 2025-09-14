@@ -21,6 +21,8 @@ export class Heap<T> implements IHeap<T> {
     } else {
       return;
     }
+
+    console.log("Heapify up hellorecursive");
   }
 
   // better performance than recursive if there are a lot of elements
@@ -49,9 +51,49 @@ export class Heap<T> implements IHeap<T> {
     this.heapifyUpRecursive(this.data.length - 1);
   }
 
+  private minChildIndexAt(currIndex: number, length: number): number {
+    const left = currIndex * 2 + 1;
+    const right = currIndex * 2 + 2;
+
+    if (left >= length) return -1;
+    if (right >= length) return left;
+
+    return this.data[left] <= this.data[right] ? left : right;
+  }
+
   private heapifyDownRecursive(currIndex: number) {
-    if (currIndex === this.data.length - 1) return;
-    // here
+    const minIndex = this.minChildIndexAt(currIndex, this.data.length);
+    if (minIndex === -1) return;
+
+    if (this.data[currIndex] > this.data[minIndex]) {
+      [this.data[currIndex], this.data[minIndex]] = [
+        this.data[minIndex],
+        this.data[currIndex],
+      ];
+      this.heapifyDownRecursive(minIndex);
+    } else {
+      return;
+    }
+  }
+
+  private heapifyDownLoop(currIndex: number) {
+    const n = this.data.length;
+    let idx = currIndex;
+
+    while (true) {
+      const minIndex = this.minChildIndexAt(currIndex, this.data.length);
+      if (minIndex === -1) break;
+
+      if (this.data[currIndex] > this.data[minIndex]) {
+        [this.data[currIndex], this.data[minIndex]] = [
+          this.data[minIndex],
+          this.data[currIndex],
+        ];
+        idx = minIndex;
+      } else {
+        break;
+      }
+    }
   }
 
   delete() {
@@ -62,6 +104,8 @@ export class Heap<T> implements IHeap<T> {
     this.data[0] = this.data[this.data.length - 1];
     this.data.pop();
     this.heapifyDownRecursive(0);
+
+    return outNode;
   }
 
   heapifyDown() {}
