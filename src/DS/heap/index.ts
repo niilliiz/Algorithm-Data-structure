@@ -2,20 +2,20 @@ import { IHeap } from "../../interfaces/IHeap";
 import { IBinaryTreeNode } from "../../interfaces/IBinary-Tree-Node";
 
 export class Heap<T> implements IHeap<T> {
-  private array: T[];
+  private data: T[];
 
   constructor() {
-    this.array = [];
+    this.data = [];
   }
 
   private heapifyUpRecursive(currIndex: number) {
     if (currIndex === 0) return;
 
     const parentIndex = Math.floor((currIndex - 1) / 2);
-    if (this.array[parentIndex] > this.array[currIndex]) {
-      [this.array[parentIndex], this.array[currIndex]] = [
-        this.array[currIndex],
-        this.array[parentIndex],
+    if (this.data[parentIndex] > this.data[currIndex]) {
+      [this.data[parentIndex], this.data[currIndex]] = [
+        this.data[currIndex],
+        this.data[parentIndex],
       ];
       this.heapifyUpRecursive(parentIndex);
     } else {
@@ -30,10 +30,10 @@ export class Heap<T> implements IHeap<T> {
     while (i > 0) {
       const parentIndex = Math.floor((currIndex - 1) / 2);
 
-      if (this.array[parentIndex] > this.array[currIndex]) {
-        [this.array[parentIndex], this.array[currIndex]] = [
-          this.array[currIndex],
-          this.array[parentIndex],
+      if (this.data[parentIndex] > this.data[currIndex]) {
+        [this.data[parentIndex], this.data[currIndex]] = [
+          this.data[currIndex],
+          this.data[parentIndex],
         ];
 
         i = parentIndex;
@@ -44,23 +44,23 @@ export class Heap<T> implements IHeap<T> {
   }
 
   insert(value: T) {
-    this.array.push(value);
+    this.data.push(value);
 
-    this.heapifyUpRecursive(this.array.length - 1);
+    this.heapifyUpRecursive(this.data.length - 1);
   }
 
   private heapifyDownRecursive(currIndex: number) {
-    if (currIndex === this.array.length - 1) return;
+    if (currIndex === this.data.length - 1) return;
     // here
   }
 
   delete() {
     if (this.isEmpty()) return;
 
-    const outNode = this.array[0];
+    const outNode = this.data[0];
 
-    this.array[0] = this.array[this.array.length - 1];
-    this.array.pop();
+    this.data[0] = this.data[this.data.length - 1];
+    this.data.pop();
     this.heapifyDownRecursive(0);
   }
 
@@ -69,13 +69,13 @@ export class Heap<T> implements IHeap<T> {
   buildHeap() {}
 
   peek() {
-    return this.array[0];
+    return this.data[0];
   }
 
   size() {
-    return this.array.length;
+    return this.data.length;
   }
   isEmpty() {
-    return this.array.length === 0;
+    return this.data.length === 0;
   }
 }
