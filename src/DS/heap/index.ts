@@ -1,5 +1,4 @@
 import { IHeap } from "../../interfaces/IHeap";
-import { IBinaryTreeNode } from "../../interfaces/IBinary-Tree-Node";
 
 export class Heap<T> implements IHeap<T> {
   private data: T[];
@@ -21,8 +20,6 @@ export class Heap<T> implements IHeap<T> {
     } else {
       return;
     }
-
-    console.log("Heapify up hellorecursive");
   }
 
   // better performance than recursive if there are a lot of elements
@@ -32,9 +29,9 @@ export class Heap<T> implements IHeap<T> {
     while (i > 0) {
       const parentIndex = Math.floor((i - 1) / 2);
 
-      if (this.data[parentIndex] > this.data[currIndex]) {
-        [this.data[parentIndex], this.data[currIndex]] = [
-          this.data[currIndex],
+      if (this.data[parentIndex] > this.data[i]) {
+        [this.data[parentIndex], this.data[i]] = [
+          this.data[i],
           this.data[parentIndex],
         ];
 
@@ -48,7 +45,7 @@ export class Heap<T> implements IHeap<T> {
   insert(value: T) {
     this.data.push(value);
 
-    this.heapifyUpRecursive(this.data.length - 1);
+    this.heapifyUpLoop(this.data.length - 1);
   }
 
   private minChildIndexAt(currIndex: number, length: number): number {
@@ -76,18 +73,17 @@ export class Heap<T> implements IHeap<T> {
     }
   }
 
-  private heapifyDownLoop(currIndex: number) {
-    const n = this.data.length;
+  private heapifyDownLoop(currIndex: number, length: number) {
     let idx = currIndex;
 
     while (true) {
-      const minIndex = this.minChildIndexAt(currIndex, this.data.length);
+      const minIndex = this.minChildIndexAt(idx, length);
       if (minIndex === -1) break;
 
-      if (this.data[currIndex] > this.data[minIndex]) {
-        [this.data[currIndex], this.data[minIndex]] = [
+      if (this.data[idx] > this.data[minIndex]) {
+        [this.data[idx], this.data[minIndex]] = [
           this.data[minIndex],
-          this.data[currIndex],
+          this.data[idx],
         ];
         idx = minIndex;
       } else {
@@ -96,21 +92,30 @@ export class Heap<T> implements IHeap<T> {
     }
   }
 
-  delete() {
+  extract() {
     if (this.isEmpty()) return;
+
+    if (this.data.length === 1) return this.data.pop();
 
     const outNode = this.data[0];
 
     this.data[0] = this.data[this.data.length - 1];
     this.data.pop();
-    this.heapifyDownRecursive(0);
+    this.heapifyDownLoop(0, this.data.length);
 
     return outNode;
   }
 
-  heapifyDown() {}
+  buildHeap(arr: T[]) {
+    this.data = arr.slice();
 
-  buildHeap() {}
+    let i = Math.floor(this.data.length / 2) - 1;
+
+    while (i >= 0) {
+      this.heapifyDownLoop(i, this.data.length);
+      i--;
+    }
+  }
 
   peek() {
     return this.data[0];
