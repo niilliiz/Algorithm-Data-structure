@@ -175,6 +175,7 @@ describe("Heap (min-heap) - comprehensive tests", () => {
   it("works with strings (lexicographic min-heap)", () => {
     const h = new Heap<string>();
     ["delta", "alpha", "charlie", "bravo"].forEach((s) => h.insert(s));
+    // @ts-ignore
     expect(isValidMinHeap((h as any).data, (a, b) => a.localeCompare(b))).toBe(
       true,
     );
