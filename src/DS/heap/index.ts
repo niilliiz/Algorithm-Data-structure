@@ -1,17 +1,22 @@
+// src/path/to/heap.ts
 import { IHeap } from "../../interfaces/IHeap";
 
 export class Heap<T> implements IHeap<T> {
   private data: T[];
+  private compare: (a: T, b: T) => number;
 
-  constructor() {
+  constructor(compare?: (a: T, b: T) => number) {
     this.data = [];
+    this.compare =
+      compare ?? ((a: any, b: any) => (a as number) - (b as number));
   }
 
+  // ---- Helpers: compare-based heapify up ----
   private heapifyUpRecursive(currIndex: number) {
     if (currIndex === 0) return;
 
     const parentIndex = Math.floor((currIndex - 1) / 2);
-    if (this.data[parentIndex] > this.data[currIndex]) {
+    if (this.compare(this.data[parentIndex], this.data[currIndex]) > 0) {
       [this.data[parentIndex], this.data[currIndex]] = [
         this.data[currIndex],
         this.data[parentIndex],
@@ -22,14 +27,13 @@ export class Heap<T> implements IHeap<T> {
     }
   }
 
-  // better performance than recursive if there are a lot of elements
   private heapifyUpLoop(currIndex: number) {
     let i = currIndex;
 
     while (i > 0) {
       const parentIndex = Math.floor((i - 1) / 2);
 
-      if (this.data[parentIndex] > this.data[i]) {
+      if (this.compare(this.data[parentIndex], this.data[i]) > 0) {
         [this.data[parentIndex], this.data[i]] = [
           this.data[i],
           this.data[parentIndex],
@@ -48,21 +52,22 @@ export class Heap<T> implements IHeap<T> {
     this.heapifyUpLoop(this.data.length - 1);
   }
 
-  private minChildIndexAt(currIndex: number, length: number): number {
+  // returns -1 when no children
+  private bestChildIndexAt(currIndex: number, length: number): number {
     const left = currIndex * 2 + 1;
     const right = currIndex * 2 + 2;
 
     if (left >= length) return -1;
     if (right >= length) return left;
 
-    return this.data[left] <= this.data[right] ? left : right;
+    return this.compare(this.data[left], this.data[right]) <= 0 ? left : right;
   }
 
   private heapifyDownRecursive(currIndex: number) {
-    const minIndex = this.minChildIndexAt(currIndex, this.data.length);
+    const minIndex = this.bestChildIndexAt(currIndex, this.data.length);
     if (minIndex === -1) return;
 
-    if (this.data[currIndex] > this.data[minIndex]) {
+    if (this.compare(this.data[currIndex], this.data[minIndex]) > 0) {
       [this.data[currIndex], this.data[minIndex]] = [
         this.data[minIndex],
         this.data[currIndex],
@@ -73,26 +78,28 @@ export class Heap<T> implements IHeap<T> {
     }
   }
 
-  private heapifyDownLoop(currIndex: number, length: number) {
+  // length param optional; if omitted, use full array length
+  private heapifyDownLoop(currIndex: number, length?: number) {
+    const n = length ?? this.data.length;
     let idx = currIndex;
 
     while (true) {
-      const minIndex = this.minChildIndexAt(idx, length);
-      if (minIndex === -1) break;
+      const bestIndex = this.bestChildIndexAt(idx, n);
+      if (bestIndex === -1) break;
 
-      if (this.data[idx] > this.data[minIndex]) {
-        [this.data[idx], this.data[minIndex]] = [
-          this.data[minIndex],
+      if (this.compare(this.data[idx], this.data[bestIndex]) > 0) {
+        [this.data[idx], this.data[bestIndex]] = [
+          this.data[bestIndex],
           this.data[idx],
         ];
-        idx = minIndex;
+        idx = bestIndex;
       } else {
         break;
       }
     }
   }
 
-  extract() {
+  extract(): T | undefined {
     if (this.isEmpty()) return;
 
     if (this.data.length === 1) return this.data.pop();
@@ -107,6 +114,7 @@ export class Heap<T> implements IHeap<T> {
   }
 
   buildHeap(arr: T[]) {
+    // avoid mutating caller array
     this.data = arr.slice();
 
     let i = Math.floor(this.data.length / 2) - 1;
@@ -117,14 +125,20 @@ export class Heap<T> implements IHeap<T> {
     }
   }
 
-  peek() {
+  peek(): T | undefined {
     return this.data[0];
   }
 
-  size() {
+  size(): number {
     return this.data.length;
   }
-  isEmpty() {
+
+  isEmpty(): boolean {
     return this.data.length === 0;
+  }
+
+  // optional utility: return a shallow copy of internal array for testing/debugging
+  toArray(): T[] {
+    return this.data.slice();
   }
 }

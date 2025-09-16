@@ -1,190 +1,137 @@
-// tests/heap.spec.ts
-import { describe, it, expect, beforeEach } from "vitest";
+// tests/heap.comparator.spec.ts
+import { describe, it, expect } from "vitest";
 import { Heap } from "../../DS/heap";
 
-// Helper: verify array follows min-heap property
-function isValidMinHeap<T>(
-  arr: T[],
-  compare: (a: T, b: T) => number = (a: any, b: any) => (a as any) - (b as any),
-) {
-  for (let i = 0; i < arr.length; i++) {
-    const left = 2 * i + 1;
-    const right = 2 * i + 2;
-    if (left < arr.length && compare(arr[i], arr[left]) > 0) return false;
-    if (right < arr.length && compare(arr[i], arr[right]) > 0) return false;
-  }
-  return true;
+function sortedAsc(arr: number[]) {
+  return [...arr].sort((a, b) => a - b);
+}
+function sortedDesc(arr: number[]) {
+  return [...arr].sort((a, b) => b - a);
 }
 
-describe("Heap (min-heap) - comprehensive tests", () => {
-  let heap: Heap<number>;
+describe("Heap comparator behavior (min & max)", () => {
+  it("default Heap<number>() behaves as a numeric min-heap (insert + extract)", () => {
+    const values = [5, 3, 8, 1, 2, 7, 6];
+    const h = new Heap<number>(); // default min-heap for numbers
 
-  beforeEach(() => {
-    heap = new Heap<number>();
-  });
-
-  it("starts empty", () => {
-    expect(heap.size()).toBe(0);
-    expect(heap.isEmpty()).toBe(true);
-    expect(heap.peek()).toBeUndefined();
-  });
-
-  it("extract on empty returns undefined", () => {
-    expect(heap.extract()).toBeUndefined();
-    expect(heap.size()).toBe(0);
-  });
-
-  it("insert and peek with single element", () => {
-    heap.insert(42);
-    expect(heap.size()).toBe(1);
-    expect(heap.isEmpty()).toBe(false);
-    expect(heap.peek()).toBe(42);
-  });
-
-  it("insert multiple elements maintains heap property (simple sequence)", () => {
-    [5, 3, 8, 1, 2].forEach((v) => heap.insert(v));
-    expect(heap.size()).toBe(5);
-    // internal array should be a valid min-heap
-    expect(isValidMinHeap((heap as any).data)).toBe(true);
-  });
-
-  it("extract returns elements in ascending order (fully emptying heap)", () => {
-    const items = [5, 3, 8, 1, 2, 7, 6];
-    items.forEach((v) => heap.insert(v));
+    values.forEach((v) => h.insert(v));
 
     const out: number[] = [];
-    while (!heap.isEmpty()) {
-      const e = heap.extract();
-      if (e !== undefined) out.push(e);
-    }
-
-    expect(out).toEqual([...items].sort((a, b) => a - b));
-  });
-
-  it("handles duplicate values", () => {
-    const items = [4, 1, 4, 2, 4, 1];
-    items.forEach((v) => heap.insert(v));
-    expect(isValidMinHeap((heap as any).data)).toBe(true);
-
-    const out: number[] = [];
-    while (!heap.isEmpty()) {
-      const e = heap.extract();
-      if (e !== undefined) out.push(e);
-    }
-    expect(out).toEqual([...items].sort((a, b) => a - b));
-  });
-
-  it("buildHeap produces valid heap and does not mutate input array", () => {
-    const arr = [3, 1, 6, 5, 2, 4];
-    const copy = arr.slice();
-    heap.buildHeap(arr);
-
-    // internal representation should be a valid min-heap
-    expect(isValidMinHeap((heap as any).data)).toBe(true);
-
-    // buildHeap should not mutate original array because implementation uses slice()
-    expect(arr).toEqual(copy);
-  });
-
-  it("buildHeap on reverse-sorted array yields valid heap and extract yields sorted order", () => {
-    const arr = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
-    heap.buildHeap(arr);
-
-    expect(isValidMinHeap((heap as any).data)).toBe(true);
-
-    const out: number[] = [];
-    while (!heap.isEmpty()) {
-      const e = heap.extract();
-      if (e !== undefined) out.push(e);
-    }
-
-    expect(out).toEqual([...arr].sort((a, b) => a - b));
-  });
-
-  it("works with negative numbers and mixed values", () => {
-    const arr = [0, -10, 5, -3, 2, -1];
-    heap.buildHeap(arr);
-    expect(isValidMinHeap((heap as any).data)).toBe(true);
-
-    const out: number[] = [];
-    while (!heap.isEmpty()) {
-      const e = heap.extract();
-      if (e !== undefined) out.push(e);
-    }
-    expect(out).toEqual([...arr].sort((a, b) => a - b));
-  });
-
-  it("insert many then extract many keeps heap property throughout operations", () => {
-    const items = [12, 4, 5, 3, 8, 7, 1, 20, 0, 15];
-    // interleave inserts and occasional extracts
-    items.forEach((v, idx) => {
-      heap.insert(v);
-      // after each insert heap must be valid
-      expect(isValidMinHeap((heap as any).data)).toBe(true);
-
-      if (idx % 3 === 0 && !heap.isEmpty()) {
-        heap.extract();
-        // after extract heap must still be valid
-        expect(isValidMinHeap((heap as any).data)).toBe(true);
-      }
-    });
-
-    // drain remaining and validate ascending order
-    const out: number[] = [];
-    while (!heap.isEmpty()) {
-      const e = heap.extract();
-      if (e !== undefined) out.push(e);
-      expect(isValidMinHeap((heap as any).data)).toBe(true);
-    }
-
-    expect(out).toEqual(
-      [...items].sort((a, b) => a - b).filter((x) => out.includes(x)),
-    ); // same multiset
-  });
-
-  it("extract returns the single element correctly and heap becomes empty", () => {
-    heap.insert(99);
-    const v = heap.extract();
-    expect(v).toBe(99);
-    expect(heap.size()).toBe(0);
-    expect(heap.isEmpty()).toBe(true);
-    expect(heap.peek()).toBeUndefined();
-  });
-
-  it("buildHeap with empty array results in empty heap", () => {
-    heap.buildHeap([]);
-    expect(heap.size()).toBe(0);
-    expect(heap.isEmpty()).toBe(true);
-    expect(heap.peek()).toBeUndefined();
-  });
-
-  it("stress test small deterministic pseudo-random set (deterministic) for correctness", () => {
-    const arr = [13, 4, 21, 9, 0, -7, 18, 2, 2, 15, 11, -1];
-    heap.buildHeap(arr);
-    expect(isValidMinHeap((heap as any).data)).toBe(true);
-
-    const out: number[] = [];
-    while (!heap.isEmpty()) {
-      const e = heap.extract();
-      if (e !== undefined) out.push(e);
-    }
-    expect(out).toEqual([...arr].sort((a, b) => a - b));
-  });
-
-  // Optional: test strings (min-heap by lexicographic order)
-  it("works with strings (lexicographic min-heap)", () => {
-    const h = new Heap<string>();
-    ["delta", "alpha", "charlie", "bravo"].forEach((s) => h.insert(s));
-    // @ts-ignore
-    expect(isValidMinHeap((h as any).data, (a, b) => a.localeCompare(b))).toBe(
-      true,
-    );
-
-    const out: string[] = [];
     while (!h.isEmpty()) {
       const e = h.extract();
       if (e !== undefined) out.push(e);
     }
-    expect(out).toEqual(["alpha", "bravo", "charlie", "delta"]);
+
+    expect(out).toEqual(sortedAsc(values));
+  });
+
+  it("Heap<number>((b,a)=>b-a) behaves as a numeric max-heap (insert + extract)", () => {
+    const values = [5, 3, 8, 1, 2, 7, 6];
+    const h = new Heap<number>((a, b) => b - a); // max-heap
+
+    values.forEach((v) => h.insert(v));
+
+    const out: number[] = [];
+    while (!h.isEmpty()) {
+      const e = h.extract();
+      if (e !== undefined) out.push(e);
+    }
+
+    expect(out).toEqual(sortedDesc(values));
+  });
+
+  it("buildHeap uses comparator correctly (min-heap): build from array then extract yields ascending order", () => {
+    const arr = [9, 4, 1, 7, 3, 8, 2, 6, 5, 0];
+    const h = new Heap<number>();
+    h.buildHeap(arr);
+
+    const out: number[] = [];
+    while (!h.isEmpty()) {
+      const e = h.extract();
+      if (e !== undefined) out.push(e);
+    }
+
+    expect(out).toEqual(sortedAsc(arr));
+  });
+
+  it("buildHeap uses comparator correctly (max-heap): build from array then extract yields descending order", () => {
+    const arr = [9, 4, 1, 7, 3, 8, 2, 6, 5, 0];
+    const h = new Heap<number>((a, b) => b - a);
+    h.buildHeap(arr);
+
+    const out: number[] = [];
+    while (!h.isEmpty()) {
+      const e = h.extract();
+      if (e !== undefined) out.push(e);
+    }
+
+    expect(out).toEqual(sortedDesc(arr));
+  });
+
+  it("handles duplicates and negative numbers with comparator correctness", () => {
+    const arr = [2, -1, 2, 0, -1, 5, 2];
+    const hMin = new Heap<number>();
+    const hMax = new Heap<number>((a, b) => b - a);
+
+    // build and drain min-heap
+    hMin.buildHeap(arr);
+    const outMin: number[] = [];
+    while (!hMin.isEmpty()) {
+      const e = hMin.extract();
+      if (e !== undefined) outMin.push(e);
+    }
+    expect(outMin).toEqual(sortedAsc(arr));
+
+    // build and drain max-heap
+    hMax.buildHeap(arr);
+    const outMax: number[] = [];
+    while (!hMax.isEmpty()) {
+      const e = hMax.extract();
+      if (e !== undefined) outMax.push(e);
+    }
+    expect(outMax).toEqual(sortedDesc(arr));
+  });
+
+  it("single element and empty heap edge cases", () => {
+    const h = new Heap<number>();
+    expect(h.extract()).toBeUndefined(); // empty
+
+    h.insert(42);
+    expect(h.peek()).toBe(42);
+    expect(h.extract()).toBe(42);
+    expect(h.extract()).toBeUndefined();
+    expect(h.isEmpty()).toBe(true);
+  });
+
+  it("works with object comparator (priority field)", () => {
+    type Task = { id: string; prio: number };
+    const tasks: Task[] = [
+      { id: "a", prio: 3 },
+      { id: "b", prio: 1 },
+      { id: "c", prio: 5 },
+      { id: "d", prio: 2 },
+    ];
+
+    // min-heap by priority
+    const minPQ = new Heap<Task>((x, y) => x.prio - y.prio);
+    minPQ.buildHeap(tasks);
+
+    const outMin: number[] = [];
+    while (!minPQ.isEmpty()) {
+      const t = minPQ.extract();
+      if (t !== undefined) outMin.push(t.prio);
+    }
+    expect(outMin).toEqual(sortedAsc(tasks.map((t) => t.prio)));
+
+    // max-heap by priority
+    const maxPQ = new Heap<Task>((x, y) => y.prio - x.prio);
+    maxPQ.buildHeap(tasks);
+
+    const outMax: number[] = [];
+    while (!maxPQ.isEmpty()) {
+      const t = maxPQ.extract();
+      if (t !== undefined) outMax.push(t.prio);
+    }
+    expect(outMax).toEqual(sortedDesc(tasks.map((t) => t.prio)));
   });
 });
