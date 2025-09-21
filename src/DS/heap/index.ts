@@ -3,7 +3,7 @@ import { IHeap } from "../../interfaces/IHeap";
 
 export class Heap<T> implements IHeap<T> {
   private data: T[];
-  private compare: (a: T, b: T) => number;
+  private readonly compare: (a: T, b: T) => number;
 
   constructor(compare?: (a: T, b: T) => number) {
     this.data = [];
