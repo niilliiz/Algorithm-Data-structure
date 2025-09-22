@@ -5,10 +5,14 @@ export class Heap<T> implements IHeap<T> {
   private data: T[];
   private readonly compare: (a: T, b: T) => number;
 
-  constructor(compare?: (a: T, b: T) => number) {
+  constructor(compare?: (a: T, b: T) => number, initialArray?: T[]) {
     this.data = [];
     this.compare =
       compare ?? ((a: any, b: any) => (a as number) - (b as number));
+
+    if (initialArray && initialArray.length > 0) {
+      this.buildHeap(initialArray);
+    }
   }
 
   // ---- Helpers: compare-based heapify up ----
@@ -53,7 +57,7 @@ export class Heap<T> implements IHeap<T> {
   }
 
   // returns -1 when no children
-  private bestChildIndexAt(currIndex: number, length: number): number {
+  private getBestChildIndex(currIndex: number, length: number): number {
     const left = currIndex * 2 + 1;
     const right = currIndex * 2 + 2;
 
@@ -64,7 +68,7 @@ export class Heap<T> implements IHeap<T> {
   }
 
   private heapifyDownRecursive(currIndex: number) {
-    const minIndex = this.bestChildIndexAt(currIndex, this.data.length);
+    const minIndex = this.getBestChildIndex(currIndex, this.data.length);
     if (minIndex === -1) return;
 
     if (this.compare(this.data[currIndex], this.data[minIndex]) > 0) {
@@ -84,7 +88,7 @@ export class Heap<T> implements IHeap<T> {
     let idx = currIndex;
 
     while (true) {
-      const bestIndex = this.bestChildIndexAt(idx, n);
+      const bestIndex = this.getBestChildIndex(idx, n);
       if (bestIndex === -1) break;
 
       if (this.compare(this.data[idx], this.data[bestIndex]) > 0) {
