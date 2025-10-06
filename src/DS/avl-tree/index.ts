@@ -1,12 +1,4 @@
-import { IAVLTree } from "../../interfaces/IAVL-Tree";
-
-type NodeObj<T> = {
-  value: T;
-  height: number;
-  left: number; // -1 means none
-  right: number; // -1 means none
-  parent: number;
-};
+import { IAVLTree, NodeObj } from "../../interfaces/IAVL-Tree";
 
 export class AVLTree<T> implements IAVLTree<T> {
   // [value, height, left, right]
@@ -18,7 +10,7 @@ export class AVLTree<T> implements IAVLTree<T> {
     this.rootIdx = -1;
   }
 
-  insertNode(newNode: NodeObj<T>) {
+  private insertNode(newNode: NodeObj<T>) {
     if (this.isEmpty()) {
       this.rootIdx = this.tree.length;
       this.tree.push(newNode);
@@ -53,8 +45,23 @@ export class AVLTree<T> implements IAVLTree<T> {
     }
   }
 
+  private calculateHeight() {
+    const newIdx = this.tree.length - 1;
+    let v = this.tree[newIdx].parent;
+
+    while (v !== -1) {
+      const leftHeight =
+        this.tree[v].left === -1 ? -1 : this.tree[this.tree[v].left].height;
+      const rightHeight =
+        this.tree[v].right === -1 ? -1 : this.tree[this.tree[v].right].height;
+
+      this.tree[v].height = Math.max(leftHeight, rightHeight) + 1;
+
+      v = this.tree[v].parent;
+    }
+  }
+
   insert(value: T) {
-    // 1- first insert node to tree like a binary search tree
     // 2- update all heights
     // 3- start from bottom to up and see if u can find unbalanced
     // 4- if yes, find the rotation kind
@@ -62,9 +69,30 @@ export class AVLTree<T> implements IAVLTree<T> {
 
     const newNode = { value, height: 0, left: -1, right: -1, parent: -1 };
     this.insertNode(newNode);
+    this.calculateHeight();
   }
 
   isEmpty(): boolean {
     return this.rootIdx === -1;
   }
+
+  get(): NodeObj<T>[] {
+    return this.tree;
+  }
 }
+
+const avlTree = new AVLTree<number>();
+avlTree.insert(10);
+avlTree.insert(3);
+avlTree.insert(5);
+avlTree.insert(15);
+avlTree.insert(20);
+avlTree.insert(17);
+avlTree.insert(7);
+avlTree.insert(30);
+avlTree.insert(25);
+avlTree.insert(19);
+avlTree.insert(28);
+avlTree.insert(29);
+
+console.log(avlTree.get());
