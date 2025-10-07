@@ -1,7 +1,6 @@
 import { IAVLTree, NodeObj } from "../../interfaces/IAVL-Tree";
 
 export class AVLTree<T> implements IAVLTree<T> {
-  // [value, height, left, right]
   private tree: NodeObj<T>[] = [];
   private rootIdx: number;
 
@@ -11,20 +10,19 @@ export class AVLTree<T> implements IAVLTree<T> {
   }
 
   private insertNode(newNode: NodeObj<T>) {
+    this.tree.push(newNode);
+    const newIdx = this.tree.length - 1;
+
     if (this.isEmpty()) {
-      this.rootIdx = this.tree.length;
-      this.tree.push(newNode);
+      this.rootIdx = newIdx;
       return;
     }
-
-    this.tree.push(newNode);
-    let newIdx = this.tree.length - 1;
 
     let curr = this.rootIdx;
 
     while (true) {
       if (newNode.value < this.tree[curr].value) {
-        // go left
+        // < go left
         if (this.tree[curr].left === -1) {
           this.tree[curr].left = newIdx;
           this.tree[newIdx].parent = curr;
@@ -33,7 +31,7 @@ export class AVLTree<T> implements IAVLTree<T> {
           curr = this.tree[curr].left;
         }
       } else {
-        // go right
+        // >= go right
         if (this.tree[curr].right === -1) {
           this.tree[curr].right = newIdx;
           this.tree[newIdx].parent = curr;
@@ -45,31 +43,62 @@ export class AVLTree<T> implements IAVLTree<T> {
     }
   }
 
-  private calculateHeight() {
-    const newIdx = this.tree.length - 1;
-    let v = this.tree[newIdx].parent;
+  /**
+   * Recompute heights upward starting at startIdx.
+   * Returns `{ zIdx }` for the lowest unbalanced node found, or `null` if none.
+   */
+  private updateHeightsUpwardFrom(startIdx: number): { zIdx: number } {
+    if (startIdx === -1) return null;
+
+    let v = startIdx;
 
     while (v !== -1) {
-      const leftHeight =
-        this.tree[v].left === -1 ? -1 : this.tree[this.tree[v].left].height;
-      const rightHeight =
-        this.tree[v].right === -1 ? -1 : this.tree[this.tree[v].right].height;
+      const leftIdx = this.tree[v].left;
+      const rightIdx = this.tree[v].right;
 
-      this.tree[v].height = Math.max(leftHeight, rightHeight) + 1;
+      const leftHeight = leftIdx === -1 ? -1 : this.tree[leftIdx].height;
+      const rightHeight = rightIdx === -1 ? -1 : this.tree[rightIdx].height;
+
+      const newHeight = Math.max(leftHeight, rightHeight) + 1;
+
+      // if height didn't change, no need to continue upward
+      if (this.tree[v].height === newHeight) return null;
+
+      this.tree[v].height = newHeight;
+      const BF = leftHeight - rightHeight;
+
+      if (Math.abs(BF) > 1) {
+        return { zIdx: v };
+      }
 
       v = this.tree[v].parent;
     }
+
+    return null;
   }
 
   insert(value: T) {
-    // 2- update all heights
     // 3- start from bottom to up and see if u can find unbalanced
     // 4- if yes, find the rotation kind
     // 5- do the rotation
 
-    const newNode = { value, height: 0, left: -1, right: -1, parent: -1 };
+    const newNode: NodeObj<T> = {
+      value,
+      height: 0,
+      left: -1,
+      right: -1,
+      parent: -1,
+    };
+
     this.insertNode(newNode);
-    this.calculateHeight();
+    const parentOfNew =
+      this.tree.length > 0 ? this.tree[this.tree.length - 1].parent : -1;
+
+    const unbalancedNode = this.updateHeightsUpwardFrom(parentOfNew);
+
+    if (unbalancedNode) {
+      // do the balancing
+    }
   }
 
   isEmpty(): boolean {
