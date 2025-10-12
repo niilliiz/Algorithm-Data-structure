@@ -47,7 +47,9 @@ export class AVLTree<T> implements IAVLTree<T> {
    * Recompute heights upward starting at startIdx.
    * Returns `{ zIdx }` for the lowest unbalanced node found, or `null` if none.
    */
-  private updateHeightsUpwardFrom(startIdx: number): { zIdx: number } {
+  private updateHeightsUpwardFrom(
+    startIdx: number,
+  ): { zIdx: number; bf: number } | null {
     if (startIdx === -1) return null;
 
     let v = startIdx;
@@ -61,10 +63,6 @@ export class AVLTree<T> implements IAVLTree<T> {
 
       const newHeight = Math.max(leftHeight, rightHeight) + 1;
 
-      /**
-       * hello
-       */
-
       // if height didn't change, no need to continue upward
       if (this.tree[v].height === newHeight) return null;
 
@@ -72,13 +70,39 @@ export class AVLTree<T> implements IAVLTree<T> {
       const BF = leftHeight - rightHeight;
 
       if (Math.abs(BF) > 1) {
-        return { zIdx: v };
+        return { zIdx: v, bf: BF };
       }
 
       v = this.tree[v].parent;
     }
 
     return null;
+  }
+
+  private calculateBalanceFactor(idx: number): number {
+    const leftIdx = this.tree[idx].left;
+    const rightIdx = this.tree[idx].right;
+
+    const leftHeight = leftIdx === -1 ? -1 : this.tree[leftIdx].height;
+    const rightHeight = rightIdx === -1 ? -1 : this.tree[rightIdx].height;
+
+    return leftHeight - rightHeight;
+  }
+
+  private balance({ zIdx, bf }: { zIdx: number; bf: number }) {
+    // first calculate BF of y
+    // second find the rotation kind
+    // third do the rotation
+
+    if (bf > 1) {
+      // left heavy
+      const yIdx = this.tree[zIdx].left;
+      const yBf = this.calculateBalanceFactor(yIdx);
+    } else if (bf < -1) {
+      //right heavy
+      const yIdx = this.tree[zIdx].right;
+      const yBf = this.calculateBalanceFactor(yIdx);
+    }
   }
 
   insert(value: T) {
@@ -101,7 +125,7 @@ export class AVLTree<T> implements IAVLTree<T> {
     const unbalancedNode = this.updateHeightsUpwardFrom(parentOfNewIdx);
 
     if (unbalancedNode) {
-      // do the balancing
+      this.balance(unbalancedNode);
     }
   }
 
