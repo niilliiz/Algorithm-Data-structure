@@ -91,10 +91,10 @@ export class AVLTree<T> implements IAVLTree<T> {
     };
 
     this.insertNode(newNode);
-    const parentOfNew =
+    const parentOfNewIdx =
       this.tree.length > 0 ? this.tree[this.tree.length - 1].parent : -1;
 
-    const unbalancedNode = this.updateHeightsUpwardFrom(parentOfNew);
+    const unbalancedNode = this.updateHeightsUpwardFrom(parentOfNewIdx);
 
     if (unbalancedNode) {
       // do the balancing
