@@ -61,6 +61,10 @@ export class AVLTree<T> implements IAVLTree<T> {
 
       const newHeight = Math.max(leftHeight, rightHeight) + 1;
 
+      /**
+       * hello
+       */
+
       // if height didn't change, no need to continue upward
       if (this.tree[v].height === newHeight) return null;
 
