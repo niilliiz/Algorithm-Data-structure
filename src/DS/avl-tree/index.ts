@@ -89,19 +89,44 @@ export class AVLTree<T> implements IAVLTree<T> {
     return leftHeight - rightHeight;
   }
 
-  private balance({ zIdx, bf }: { zIdx: number; bf: number }) {
-    // first calculate BF of y
-    // second find the rotation kind
-    // third do the rotation
+  private rotateLeft(idx: number) {}
+  private rotateRight(zIdx: number, yIdx: number) {
+    this.rootIdx = yIdx;
+    this.tree[yIdx].parent = -1;
+    if (this.tree[yIdx].right !== -1) {
+      this.tree[zIdx].left = this.tree[yIdx].right;
+    }
 
+    this.tree[yIdx].right = zIdx;
+  }
+
+  private balance({ zIdx, bf }: { zIdx: number; bf: number }) {
     if (bf > 1) {
-      // left heavy
+      // left heavy and check if is not -1
       const yIdx = this.tree[zIdx].left;
       const yBf = this.calculateBalanceFactor(yIdx);
+
+      if (yBf >= 0) {
+        // left-left
+        this.rotateRight(zIdx, yIdx);
+      } else {
+        // left-right
+        this.rotateLeft(yIdx);
+        this.rotateRight(zIdx, yIdx);
+      }
     } else if (bf < -1) {
       //right heavy
       const yIdx = this.tree[zIdx].right;
       const yBf = this.calculateBalanceFactor(yIdx);
+
+      if (yBf <= 0) {
+        // right-right
+        this.rotateLeft(zIdx);
+      } else {
+        // right-left
+        this.rotateRight(zIdx, yIdx);
+        this.rotateLeft(zIdx);
+      }
     }
   }
 
