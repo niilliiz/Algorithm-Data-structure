@@ -90,14 +90,34 @@ export class AVLTree<T> implements IAVLTree<T> {
   }
 
   private rotateLeft(idx: number) {}
-  private rotateRight(zIdx: number, yIdx: number) {
-    this.rootIdx = yIdx;
-    this.tree[yIdx].parent = -1;
-    if (this.tree[yIdx].right !== -1) {
-      this.tree[zIdx].left = this.tree[yIdx].right;
+  private rotateRight(zIdx: number): number {
+    let yIdx = this.tree[zIdx].left;
+    let t3 = this.tree[yIdx].right;
+    let p = this.tree[zIdx].parent;
+
+    this.tree[zIdx].left = t3;
+    if (t3 !== -1) {
+      this.tree[t3].parent = zIdx;
+    }
+    this.tree[yIdx].right = zIdx;
+    this.tree[zIdx].parent = yIdx;
+    this.tree[yIdx].parent = p;
+    if (p === -1) {
+      this.rootIdx = yIdx;
+    } else if (this.tree[p].left === zIdx) {
+      this.tree[p].left = yIdx;
+    } else {
+      this.tree[p].right = yIdx;
     }
 
-    this.tree[yIdx].right = zIdx;
+    this.tree[zIdx].height =
+      1 + Math.max(this.tree[zIdx].left, this.tree[zIdx].right);
+    this.tree[yIdx].height =
+      1 + Math.max(this.tree[yIdx].left, this.tree[yIdx].right);
+
+    this.updateHeightsUpwardFrom(this.tree[yIdx].parent);
+
+    return yIdx;
   }
 
   private balance({ zIdx, bf }: { zIdx: number; bf: number }) {
@@ -108,11 +128,11 @@ export class AVLTree<T> implements IAVLTree<T> {
 
       if (yBf >= 0) {
         // left-left
-        this.rotateRight(zIdx, yIdx);
+        this.rotateRight(zIdx);
       } else {
         // left-right
         this.rotateLeft(yIdx);
-        this.rotateRight(zIdx, yIdx);
+        this.rotateRight(zIdx);
       }
     } else if (bf < -1) {
       //right heavy
@@ -124,7 +144,7 @@ export class AVLTree<T> implements IAVLTree<T> {
         this.rotateLeft(zIdx);
       } else {
         // right-left
-        this.rotateRight(zIdx, yIdx);
+        this.rotateRight(zIdx);
         this.rotateLeft(zIdx);
       }
     }
