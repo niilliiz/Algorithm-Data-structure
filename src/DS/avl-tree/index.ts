@@ -58,8 +58,8 @@ export class AVLTree<T> implements IAVLTree<T> {
       const leftIdx = this.tree[v].left;
       const rightIdx = this.tree[v].right;
 
-      const leftHeight = leftIdx === -1 ? -1 : this.tree[leftIdx].height;
-      const rightHeight = rightIdx === -1 ? -1 : this.tree[rightIdx].height;
+      const leftHeight = this.getHeightOf(leftIdx);
+      const rightHeight = this.getHeightOf(rightIdx);
 
       const newHeight = Math.max(leftHeight, rightHeight) + 1;
 
@@ -79,12 +79,16 @@ export class AVLTree<T> implements IAVLTree<T> {
     return null;
   }
 
+  private getHeightOf(idx: number): number {
+    return idx === -1 ? -1 : this.tree[idx].height;
+  }
+
   private calculateBalanceFactor(idx: number): number {
     const leftIdx = this.tree[idx].left;
     const rightIdx = this.tree[idx].right;
 
-    const leftHeight = leftIdx === -1 ? -1 : this.tree[leftIdx].height;
-    const rightHeight = rightIdx === -1 ? -1 : this.tree[rightIdx].height;
+    const leftHeight = this.getHeightOf(leftIdx);
+    const rightHeight = this.getHeightOf(rightIdx);
 
     return leftHeight - rightHeight;
   }
@@ -92,6 +96,8 @@ export class AVLTree<T> implements IAVLTree<T> {
   private rotateLeft(idx: number) {}
   private rotateRight(zIdx: number): number {
     let yIdx = this.tree[zIdx].left;
+    if (yIdx === -1) return zIdx;
+
     let t3 = this.tree[yIdx].right;
     let p = this.tree[zIdx].parent;
 
@@ -99,8 +105,10 @@ export class AVLTree<T> implements IAVLTree<T> {
     if (t3 !== -1) {
       this.tree[t3].parent = zIdx;
     }
+
     this.tree[yIdx].right = zIdx;
     this.tree[zIdx].parent = yIdx;
+
     this.tree[yIdx].parent = p;
     if (p === -1) {
       this.rootIdx = yIdx;
@@ -110,10 +118,17 @@ export class AVLTree<T> implements IAVLTree<T> {
       this.tree[p].right = yIdx;
     }
 
-    this.tree[zIdx].height =
-      1 + Math.max(this.tree[zIdx].left, this.tree[zIdx].right);
-    this.tree[yIdx].height =
-      1 + Math.max(this.tree[yIdx].left, this.tree[yIdx].right);
+    const zLeft = this.tree[zIdx].left;
+    const zRight = this.tree[zIdx].right;
+    const zLeftH = this.getHeightOf(zLeft);
+    const zRightH = this.getHeightOf(zRight);
+    this.tree[zIdx].height = 1 + Math.max(zLeftH, zRightH);
+
+    const yLeft = this.tree[yIdx].left;
+    const yRight = this.tree[yIdx].right;
+    const yLeftH = this.getHeightOf(yLeft);
+    const yRightH = this.getHeightOf(yRight);
+    this.tree[yIdx].height = 1 + Math.max(yLeftH, yRightH);
 
     this.updateHeightsUpwardFrom(this.tree[yIdx].parent);
 
@@ -128,11 +143,14 @@ export class AVLTree<T> implements IAVLTree<T> {
 
       if (yBf >= 0) {
         // left-left
-        this.rotateRight(zIdx);
+        const newRoot = this.rotateRight(zIdx);
+        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
       } else {
         // left-right
-        this.rotateLeft(yIdx);
-        this.rotateRight(zIdx);
+        const xIdx = this.rotateLeft(yIdx);
+        const newRoot = this.rotateRight(zIdx);
+        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
+        return newRoot;
       }
     } else if (bf < -1) {
       //right heavy
@@ -141,20 +159,22 @@ export class AVLTree<T> implements IAVLTree<T> {
 
       if (yBf <= 0) {
         // right-right
-        this.rotateLeft(zIdx);
+        const newRoot = this.rotateLeft(zIdx);
+        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
+        return newRoot;
       } else {
         // right-left
-        this.rotateRight(zIdx);
-        this.rotateLeft(zIdx);
+        const xIdx = this.rotateRight(yIdx);
+        const newRoot = this.rotateLeft(zIdx);
+        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
+        return newRoot;
       }
     }
+
+    return zIdx;
   }
 
   insert(value: T) {
-    // 3- start from bottom to up and see if u can find unbalanced
-    // 4- if yes, find the rotation kind
-    // 5- do the rotation
-
     const newNode: NodeObj<T> = {
       value,
       height: 0,
