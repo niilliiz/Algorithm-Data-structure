@@ -22,7 +22,6 @@ export class AVLTree<T> implements IAVLTree<T> {
 
     while (true) {
       if (newNode.value < this.tree[curr].value) {
-        // < go left
         if (this.tree[curr].left === -1) {
           this.tree[curr].left = newIdx;
           this.tree[newIdx].parent = curr;
@@ -31,7 +30,6 @@ export class AVLTree<T> implements IAVLTree<T> {
           curr = this.tree[curr].left;
         }
       } else {
-        // >= go right
         if (this.tree[curr].right === -1) {
           this.tree[curr].right = newIdx;
           this.tree[newIdx].parent = curr;
@@ -41,6 +39,10 @@ export class AVLTree<T> implements IAVLTree<T> {
         }
       }
     }
+  }
+
+  private getHeightOf(idx: number): number {
+    return idx === -1 ? -1 : this.tree[idx].height;
   }
 
   /**
@@ -55,13 +57,9 @@ export class AVLTree<T> implements IAVLTree<T> {
     let v = startIdx;
 
     while (v !== -1) {
-      const leftIdx = this.tree[v].left;
-      const rightIdx = this.tree[v].right;
-
-      const leftHeight = this.getHeightOf(leftIdx);
-      const rightHeight = this.getHeightOf(rightIdx);
-
-      const newHeight = Math.max(leftHeight, rightHeight) + 1;
+      const leftHeight = this.getHeightOf(this.tree[v].left);
+      const rightHeight = this.getHeightOf(this.tree[v].right);
+      const newHeight = 1 + Math.max(leftHeight, rightHeight);
 
       // if height didn't change, no need to continue upward
       if (this.tree[v].height === newHeight) return null;
@@ -79,10 +77,6 @@ export class AVLTree<T> implements IAVLTree<T> {
     return null;
   }
 
-  private getHeightOf(idx: number): number {
-    return idx === -1 ? -1 : this.tree[idx].height;
-  }
-
   private calculateBalanceFactor(idx: number): number {
     const leftIdx = this.tree[idx].left;
     const rightIdx = this.tree[idx].right;
@@ -93,7 +87,46 @@ export class AVLTree<T> implements IAVLTree<T> {
     return leftHeight - rightHeight;
   }
 
-  private rotateLeft(idx: number) {}
+  private rotateLeft(zIdx: number): number {
+    let yIdx = this.tree[zIdx].right;
+    if (yIdx === -1) return zIdx;
+
+    let t2 = this.tree[yIdx].left;
+    let p = this.tree[zIdx].parent;
+
+    this.tree[zIdx].right = t2;
+    if (t2 !== -1) {
+      this.tree[t2].parent = zIdx;
+    }
+
+    this.tree[yIdx].left = zIdx;
+    this.tree[zIdx].parent = yIdx;
+
+    this.tree[yIdx].parent = p;
+    if (p === -1) {
+      this.rootIdx = yIdx;
+    } else if (this.tree[p].left === zIdx) {
+      this.tree[p].left = yIdx;
+    } else {
+      this.tree[p].right = yIdx;
+    }
+
+    this.tree[zIdx].height =
+      1 +
+      Math.max(
+        this.getHeightOf(this.tree[zIdx].left),
+        this.getHeightOf(this.tree[zIdx].right),
+      );
+
+    this.tree[yIdx].height =
+      1 +
+      Math.max(
+        this.getHeightOf(this.tree[yIdx].left),
+        this.getHeightOf(this.tree[yIdx].right),
+      );
+
+    return yIdx;
+  }
   private rotateRight(zIdx: number): number {
     let yIdx = this.tree[zIdx].left;
     if (yIdx === -1) return zIdx;
@@ -118,56 +151,53 @@ export class AVLTree<T> implements IAVLTree<T> {
       this.tree[p].right = yIdx;
     }
 
-    const zLeft = this.tree[zIdx].left;
-    const zRight = this.tree[zIdx].right;
-    const zLeftH = this.getHeightOf(zLeft);
-    const zRightH = this.getHeightOf(zRight);
-    this.tree[zIdx].height = 1 + Math.max(zLeftH, zRightH);
+    this.tree[zIdx].height =
+      1 +
+      Math.max(
+        this.getHeightOf(this.tree[zIdx].left),
+        this.getHeightOf(this.tree[zIdx].right),
+      );
 
-    const yLeft = this.tree[yIdx].left;
-    const yRight = this.tree[yIdx].right;
-    const yLeftH = this.getHeightOf(yLeft);
-    const yRightH = this.getHeightOf(yRight);
-    this.tree[yIdx].height = 1 + Math.max(yLeftH, yRightH);
-
-    this.updateHeightsUpwardFrom(this.tree[yIdx].parent);
+    this.tree[yIdx].height =
+      1 +
+      Math.max(
+        this.getHeightOf(this.tree[yIdx].left),
+        this.getHeightOf(this.tree[yIdx].right),
+      );
 
     return yIdx;
   }
 
   private balance({ zIdx, bf }: { zIdx: number; bf: number }) {
     if (bf > 1) {
-      // left heavy and check if is not -1
+      // left heavy
       const yIdx = this.tree[zIdx].left;
+      if (yIdx === -1) return zIdx;
+
       const yBf = this.calculateBalanceFactor(yIdx);
 
       if (yBf >= 0) {
         // left-left
-        const newRoot = this.rotateRight(zIdx);
-        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
+        return this.rotateRight(zIdx);
       } else {
         // left-right
-        const xIdx = this.rotateLeft(yIdx);
-        const newRoot = this.rotateRight(zIdx);
-        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
-        return newRoot;
+        const _ = this.rotateLeft(yIdx);
+        return this.rotateRight(zIdx);
       }
     } else if (bf < -1) {
       //right heavy
       const yIdx = this.tree[zIdx].right;
+      if (yIdx === -1) return zIdx;
+
       const yBf = this.calculateBalanceFactor(yIdx);
 
       if (yBf <= 0) {
         // right-right
-        const newRoot = this.rotateLeft(zIdx);
-        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
-        return newRoot;
+        return this.rotateLeft(zIdx);
       } else {
         // right-left
-        const xIdx = this.rotateRight(yIdx);
-        const newRoot = this.rotateLeft(zIdx);
-        this.updateHeightsUpwardFrom(this.tree[newRoot].parent);
-        return newRoot;
+        const _ = this.rotateRight(yIdx);
+        return this.rotateLeft(zIdx);
       }
     }
 
@@ -184,13 +214,16 @@ export class AVLTree<T> implements IAVLTree<T> {
     };
 
     this.insertNode(newNode);
+
     const parentOfNewIdx =
       this.tree.length > 0 ? this.tree[this.tree.length - 1].parent : -1;
 
     const unbalancedNode = this.updateHeightsUpwardFrom(parentOfNewIdx);
 
     if (unbalancedNode) {
-      this.balance(unbalancedNode);
+      const newRoot = this.balance(unbalancedNode);
+      const parentAfter = newRoot !== -1 ? this.tree[newRoot].parent : -1;
+      this.updateHeightsUpwardFrom(parentAfter);
     }
   }
 
