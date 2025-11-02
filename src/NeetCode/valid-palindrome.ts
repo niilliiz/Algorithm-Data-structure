@@ -39,6 +39,7 @@ function validPalindrome(word: string) {
     while (i < j && !isAlnum.test(word[i].toLowerCase())) {
       i += 1;
     }
+
     while (i < j && !isAlnum.test(word[j].toLowerCase())) {
       j -= 1;
     }
