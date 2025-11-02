@@ -204,6 +204,28 @@ export class AVLTree<T> implements IAVLTree<T> {
     return zIdx;
   }
 
+  private rebalanceUpwardFrom(startIdx: number) {
+    if (startIdx === -1) return;
+
+    let v = startIdx;
+
+    while (v !== -1) {
+      const leftH = this.getHeightOf(this.tree[v].left);
+      const rightH = this.getHeightOf(this.tree[v].right);
+      this.tree[v].height = 1 + Math.max(leftH, rightH);
+
+      const bf = leftH - rightH;
+
+      if (Math.abs(bf) > 1) {
+        const newRootIdx = this.balance({ zIdx: v, bf });
+
+        v = this.tree[newRootIdx].parent;
+      } else {
+        v = this.tree[v].parent;
+      }
+    }
+  }
+
   insert(value: T) {
     const newNode: NodeObj<T> = {
       value,
@@ -218,13 +240,7 @@ export class AVLTree<T> implements IAVLTree<T> {
     const parentOfNewIdx =
       this.tree.length > 0 ? this.tree[this.tree.length - 1].parent : -1;
 
-    const unbalancedNode = this.updateHeightsUpwardFrom(parentOfNewIdx);
-
-    if (unbalancedNode) {
-      const newRoot = this.balance(unbalancedNode);
-      const parentAfter = newRoot !== -1 ? this.tree[newRoot].parent : -1;
-      this.updateHeightsUpwardFrom(parentAfter);
-    }
+    this.rebalanceUpwardFrom(parentOfNewIdx);
   }
 
   isEmpty(): boolean {
