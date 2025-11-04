@@ -212,7 +212,10 @@ export class AVLTree<T> implements IAVLTree<T> {
     while (v !== -1) {
       const leftH = this.getHeightOf(this.tree[v].left);
       const rightH = this.getHeightOf(this.tree[v].right);
-      this.tree[v].height = 1 + Math.max(leftH, rightH);
+
+      const newHeight = 1 + Math.max(leftH, rightH);
+      if (this.tree[v].height === newHeight) break;
+      this.tree[v].height = newHeight;
 
       const bf = leftH - rightH;
 
@@ -241,6 +244,82 @@ export class AVLTree<T> implements IAVLTree<T> {
       this.tree.length > 0 ? this.tree[this.tree.length - 1].parent : -1;
 
     this.rebalanceUpwardFrom(parentOfNewIdx);
+  }
+
+  private findSuccessor(nodeIdx: number): number {
+    if (this.tree[nodeIdx].right === -1) return -1;
+    let successor = this.tree[nodeIdx].right;
+    while (this.tree[successor].left !== -1) {
+      successor = this.tree[successor].left;
+    }
+    return successor;
+  }
+
+  private isNodeInTree(idx: number): boolean {
+    if (this.isEmpty()) return false;
+    if (idx < 0 || idx >= this.tree.length) return false;
+    const n = this.tree[idx];
+    return (
+      idx === this.rootIdx || n.parent !== -1 || n.left !== -1 || n.right !== -1
+    );
+  }
+
+  delete(outNodeIdx: number) {
+    if (!this.isNodeInTree(outNodeIdx)) return null;
+
+    const originalOutNodeValue = this.tree[outNodeIdx].value;
+    if (
+      this.tree[outNodeIdx].left !== -1 &&
+      this.tree[outNodeIdx].right !== -1
+    ) {
+      let successorIdx = this.findSuccessor(outNodeIdx);
+
+      this.tree[outNodeIdx].value = this.tree[successorIdx].value;
+
+      outNodeIdx = successorIdx;
+    }
+
+    const outNode = this.tree[outNodeIdx];
+    const parentIdx = outNode.parent;
+    const leftIdx = outNode.left;
+    const rightIdx = outNode.right;
+
+    if (leftIdx === -1 && rightIdx === -1) {
+      if (parentIdx === -1) {
+        this.rootIdx = -1;
+      } else {
+        if (this.tree[parentIdx].left === outNodeIdx) {
+          this.tree[parentIdx].left = -1;
+        } else if (this.tree[parentIdx].right === outNodeIdx) {
+          this.tree[parentIdx].right = -1;
+        }
+      }
+
+      outNode.parent = outNode.left = outNode.right = -1;
+
+      this.rebalanceUpwardFrom(parentIdx);
+
+      return originalOutNodeValue;
+    }
+
+    const childIdx = leftIdx !== -1 ? leftIdx : rightIdx;
+    if (parentIdx === -1) {
+      this.rootIdx = childIdx;
+      this.tree[childIdx].parent = -1;
+    } else {
+      if (this.tree[parentIdx].left === outNodeIdx) {
+        this.tree[parentIdx].left = childIdx;
+      } else if (this.tree[parentIdx].right === outNodeIdx) {
+        this.tree[parentIdx].right = childIdx;
+      }
+      this.tree[childIdx].parent = parentIdx;
+    }
+
+    outNode.parent = outNode.left = outNode.right = -1;
+
+    this.rebalanceUpwardFrom(parentIdx);
+
+    return originalOutNodeValue;
   }
 
   isEmpty(): boolean {

@@ -8,6 +8,7 @@ export type NodeObj<T> = {
 
 export interface IAVLTree<T> {
   insert(value: T): void;
+  delete(outNodeIdx: number): T;
   isEmpty(): boolean;
   get(): NodeObj<T>[];
 }
