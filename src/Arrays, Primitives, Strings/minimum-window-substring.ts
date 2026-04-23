@@ -1,9 +1,7 @@
-function isContainedAll(window: string, target: string): boolean {
-  const targetFreq = new Map<string, number>();
+import calculateCharCount from "../utils/calculate-char-count";
 
-  for (const ch of target) {
-    targetFreq.set(ch, (targetFreq.get(ch) ?? 0) + 1);
-  }
+function isContainedAll(window: string, target: string): boolean {
+  const targetFreq = calculateCharCount(target);
 
   for (const ch of window) {
     if (targetFreq.has(ch)) {
@@ -35,6 +33,53 @@ function bruteforce_minimumWindowSubstring(s: string, t: string): string {
         }
       }
     }
+  }
+
+  return minSubstring;
+}
+
+export function minimumWindowSubstring(s: string, t: string): string {
+  if (s.length === 0 || t.length === 0) return "";
+
+  const need = calculateCharCount(t);
+  let have = new Map<string, number>();
+  const required = need.size;
+  let minSubstring = "";
+
+  let satisfied = 0;
+  let left = 0;
+  let right = 0;
+
+  while (right < s.length) {
+    // ------------INCOMING
+    const incomingChar = s[right];
+    have.set(incomingChar, (have.get(incomingChar) ?? 0) + 1);
+
+    if (have.get(incomingChar) === need.get(incomingChar)) {
+      satisfied++;
+    }
+
+    // shrink while valid
+    while (satisfied === required) {
+      const window = s.substring(left, right + 1);
+
+      if (minSubstring === "" || minSubstring.length > window.length) {
+        minSubstring = window;
+      }
+
+      const outgoingChar = s[left];
+      left++;
+      have.set(outgoingChar, have.get(outgoingChar) - 1);
+
+      if (
+        need.get(outgoingChar) &&
+        have.get(outgoingChar) < need.get(outgoingChar)
+      ) {
+        satisfied--;
+      }
+    }
+
+    right++;
   }
 
   return minSubstring;
