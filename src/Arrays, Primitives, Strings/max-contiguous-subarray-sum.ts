@@ -1,3 +1,5 @@
+// O(n)
+
 export default function MaxContiguousSubArraySum(arr: number[]) {
   let currentSum = 0;
   let maxSum = -Infinity;
