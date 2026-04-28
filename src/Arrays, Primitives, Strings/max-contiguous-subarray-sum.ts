@@ -6,8 +6,8 @@ export default function MaxContiguousSubArraySum(arr: number[]) {
   let currentStart = 0;
 
   for (let pos = 0; pos < arr.length; pos++) {
+    const optionA = arr[pos] + currentSum;
     const optionB = arr[pos];
-    const optionA = optionB + currentSum;
     const isExtending = optionA > optionB;
 
     if (isExtending) {
