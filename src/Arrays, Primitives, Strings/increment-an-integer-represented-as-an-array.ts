@@ -23,3 +23,14 @@ function PlusOne(arr: number[]): number[] {
 
   return arr;
 }
+
+function UnOptimized_PlusOne(arr) {
+  let num = Number(arr.join("")); // O(n)
+  num = num + 1; // O(1)
+  return String(num).split("").map(Number); // O(n)
+}
+
+/*
+* Time Complexity: O(n) - Space Complexity: O(n) — new arrays created during conversions
+Problem: Fails with large arrays! JavaScript numbers have a limit (~2^53). [9,9,9,...huge array] will lose precision.
+* */
