@@ -8,8 +8,8 @@
 export default function MaxContiguousSubArraySum(arr: number[]) {
   let currentSum = 0;
   let maxSum = -Infinity;
-  let bestStart = 0;
-  let bestEnd = 0;
+  let subStart = 0;
+  let subEnd = 0;
   let currentStart = 0;
 
   for (let pos = 0; pos < arr.length; pos++) {
@@ -26,10 +26,10 @@ export default function MaxContiguousSubArraySum(arr: number[]) {
 
     if (currentSum > maxSum) {
       maxSum = currentSum;
-      bestStart = currentStart;
-      bestEnd = pos;
+      subStart = currentStart;
+      subEnd = pos;
     }
   }
-  const subArray = arr.slice(bestStart, bestEnd + 1);
+  const subArray = arr.slice(subStart, subEnd + 1);
   return { subArray, maxSum };
 }
