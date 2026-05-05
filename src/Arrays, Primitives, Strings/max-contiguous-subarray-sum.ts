@@ -1,5 +1,10 @@
 // O(n)
 
+/**
+ * arr: [−2, 1, −3, 4, −1, 2, 1, −5, 4]
+ * solution: { subArray: [ 4, -1, 2, 1 ], maxSum: 6 }
+ */
+
 export default function MaxContiguousSubArraySum(arr: number[]) {
   let currentSum = 0;
   let maxSum = -Infinity;
