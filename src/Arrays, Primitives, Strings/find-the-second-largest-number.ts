@@ -1,7 +1,7 @@
 import { Heap } from "../DS/heap";
 
 // space: O(1) - time: O(n)
-export function findTheSecondLargetsNumber_twoPointer(arr) {
+export function findTheSecondLargetsNumber_twoPointer(arr: number[]) {
   if (arr.length === 0) return;
 
   let first = -Infinity;
@@ -30,7 +30,7 @@ export function findTheSecondLargetsNumber_heap(arr: number[]) {
   for (let i = 0; i < arr.length; i++) {
     if (minHeap.size() < 2) {
       minHeap.insert(arr[i]);
-    } else if (arr[i] > minHeap.peek() && minHeap.peek() === arr[i]) {
+    } else if (arr[i] > minHeap.peek() && minHeap.peek() !== arr[i]) {
       minHeap.extract();
       minHeap.insert(arr[i]);
     }
@@ -40,3 +40,4 @@ export function findTheSecondLargetsNumber_heap(arr: number[]) {
 }
 
 findTheSecondLargetsNumber_heap([-1, 10, 8, 9, 10, 9, -8, 11]);
+console.log(findTheSecondLargetsNumber_heap([-1, 10, 8, 9, 10, 9, -8]));
