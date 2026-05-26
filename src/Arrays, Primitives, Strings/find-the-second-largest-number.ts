@@ -30,14 +30,17 @@ export function findTheSecondLargetsNumber_heap(arr: number[]) {
   for (let i = 0; i < arr.length; i++) {
     if (minHeap.size() < 2) {
       minHeap.insert(arr[i]);
-    } else if (arr[i] > minHeap.peek() && minHeap.peek() !== arr[i]) {
-      minHeap.extract();
-      minHeap.insert(arr[i]);
+    } else if (arr[i] > minHeap.peek()) {
+      const heapArray = minHeap.toArray();
+      if (arr[i] !== heapArray[0] && arr[i] !== heapArray[1]) {
+        minHeap.extract();
+        minHeap.insert(arr[i]);
+      }
     }
   }
 
   return minHeap.peek();
 }
 
-findTheSecondLargetsNumber_heap([-1, 10, 8, 9, 10, 9, -8, 11]);
-console.log(findTheSecondLargetsNumber_heap([-1, 10, 8, 9, 10, 9, -8]));
+// findTheSecondLargetsNumber_heap([-1, 10, 8, 9, 10, 9, -8]);
+console.log(findTheSecondLargetsNumber_heap([-1, 8, -8]));
