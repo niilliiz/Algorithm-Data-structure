@@ -30,17 +30,17 @@
  */
 
 function validPalindrome(word: string) {
-  const isAlnum = /[a-z0-9]/;
+  const alNum = /[a-z0-9]/;
 
   let i = 0;
   let j = word.length - 1;
 
   while (i < j) {
-    while (i < j && !isAlnum.test(word[i].toLowerCase())) {
+    while (i < j && !alNum.test(word[i].toLowerCase())) {
       i += 1;
     }
 
-    while (i < j && !isAlnum.test(word[j].toLowerCase())) {
+    while (i < j && !alNum.test(word[j].toLowerCase())) {
       j -= 1;
     }
 
